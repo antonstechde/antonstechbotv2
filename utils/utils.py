@@ -7,3 +7,7 @@ def get_project_dir() -> str:
     :return: Path of the project directory as a string
     """
     return str(pathlib.Path(__file__).parent.parent.absolute())
+
+
+def run_checks():
+    pass
