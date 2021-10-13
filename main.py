@@ -1,3 +1,5 @@
+import pathlib
+
 from discord import Client, Intents, Embed
 from discord.ext.commands import Bot
 from discord_slash import SlashCommand, SlashContext
@@ -15,15 +17,11 @@ slash = SlashCommand(bot)
 
 config.setup()
 
-
-@slash.slash(name="test")
-async def test(ctx: SlashContext):
-    embed = Embed(title="Embed test")
-    await ctx.send(embed=embed)
-
-
 for file in os.listdir(utils.get_project_dir() + "/cogs/"):
-    bot.load_extension(f"cogs/{file[:-3]}")
+    if os.path.isdir(utils.get_project_dir() + "/cogs/" + file):
+        continue
+
+    bot.load_extension(f"cogs.{file[:-3]}")
 
 
 bot.run(config.TOKEN)
