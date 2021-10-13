@@ -13,7 +13,7 @@ import os
 bot = Bot(command_prefix="!", self_bot=True, intents=Intents.default())
 bot.remove_command("help")
 
-slash = SlashCommand(bot)
+slash = SlashCommand(bot, sync_commands=true)
 
 config.setup()
 
