@@ -15,7 +15,7 @@ bot.remove_command("help")
 
 slash = SlashCommand(bot, sync_commands=True)
 
-config.setup()
+utils.run_checks()
 
 for file in os.listdir(utils.get_project_dir() + "/cogs/"):
     if os.path.isdir(utils.get_project_dir() + "/cogs/" + file):
@@ -24,4 +24,4 @@ for file in os.listdir(utils.get_project_dir() + "/cogs/"):
     bot.load_extension(f"cogs.{file[:-3]}")
 
 
-bot.run(config.TOKEN)
+bot.run(utils.CONFIG.TOKEN)
