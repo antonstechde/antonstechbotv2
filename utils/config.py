@@ -14,17 +14,22 @@ class Config:
         self.DATABASE_USER = None
         self.DATABASE_PASSWORD = None
 
+        self.setup()
+
     def setup(self):
         bot_config = self.__config_parser__["BOT"]
 
         self.TOKEN = bot_config["TOKEN"]
 
-        database_config = self.__config_parser__["DATABASE"]
+        for item in self.__config_parser__.items():
+            print(item)
 
-        self.DATABASE_USER = database_config["USER"]
-        self.DATABASE_PASSWORD = database_config["PASSWORD"]
-        self.DATABASE_PORT = database_config["PORT"]
-        self.DATABASE_HOST = database_config["HOST"]
-        self.DATABASE_NAME = database_config["DATABASE"]
+        # database_config = self.__config_parser__["DATABASE"]
+        #
+        # self.DATABASE_USER = database_config["USER"]
+        # self.DATABASE_PASSWORD = database_config["PASSWORD"]
+        # self.DATABASE_PORT = database_config["PORT"]
+        # self.DATABASE_HOST = database_config["HOST"]
+        # self.DATABASE_NAME = database_config["DATABASE"]
 
 
