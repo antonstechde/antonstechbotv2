@@ -1,8 +1,9 @@
 import pathlib
 
-from discord import Client, Intents, Embed
+import discord
+from discord import Client, Intents, Embed, Status
 from discord.ext.commands import AutoShardedBot
-from discord_slash import SlashCommand, SlashContext
+from discord_slash import SlashCommand, SlashContext, __version__
 from utils import utils
 from utils import config
 import os
@@ -21,11 +22,25 @@ utils.run_checks()
 
 @bot.event
 async def on_ready():
-    print(f"You are logged in as {bot.user} via discord.py Version {1}")
+    print(f"You are logged in as {bot.user} via discord-py-interactions Version {__version__}")
     print(f"The Bot is running on {len(list(bot.shards))} Shards")
     print("The Bot is on the following " + str(len(bot.guilds)) + " Servers:")
     for guild in bot.guilds:
         print("- " + str(guild.name))
+    bot.loop.create_task(status_task())
+
+
+async def status_task():
+    while True:
+        await bot.change_presence(activity=discord.Game("https://git.io/techbotv2"),
+                                  status=discord.Status.online)
+        await asyncio.sleep(60)
+        await bot.change_presence(
+            activity=discord.Game("on " + str(len(bot.guilds)) + " Servers"))
+        await asyncio.sleep(60)
+        await bot.change_presence(
+            activity=discord.Activity(type=discord.ActivityType.watching, name="your Messages"))
+        await asyncio.sleep(60)
 
 
 for file in os.listdir(utils.get_project_dir() + "/cogs/"):
