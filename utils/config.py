@@ -21,15 +21,12 @@ class Config:
 
         self.TOKEN = bot_config["TOKEN"]
 
-        for item in self.__config_parser__.items():
-            print(item)
+        database_config = self.__config_parser__["DATABASE"]
 
-        # database_config = self.__config_parser__["DATABASE"]
-        #
-        # self.DATABASE_USER = database_config["USER"]
-        # self.DATABASE_PASSWORD = database_config["PASSWORD"]
-        # self.DATABASE_PORT = database_config["PORT"]
-        # self.DATABASE_HOST = database_config["HOST"]
-        # self.DATABASE_NAME = database_config["DATABASE"]
+        self.DATABASE_USER = database_config["USER"]
+        self.DATABASE_PASSWORD = database_config["PASSWORD"]
+        self.DATABASE_PORT = database_config["PORT"]
+        self.DATABASE_HOST = database_config["HOST"]
+        self.DATABASE_NAME = database_config["DATABASE"]
 
 
