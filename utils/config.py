@@ -1,6 +1,6 @@
 import configparser
 from utils import utils
-
+from configparser import *
 
 class Config:
     def __init__(self):
@@ -29,4 +29,10 @@ class Config:
         self.DATABASE_HOST = database_config["HOST"]
         self.DATABASE_NAME = database_config["DATABASE"]
 
-
+        betteruptime_config = self.__config_parser__["BETTERUPTIME-INTEGRATION"]
+        self.betteruptime_enabled = betteruptime_config["ENABLED"]
+        if self.betteruptime_enabled == "true":
+            self.betteruptime_url = betteruptime_config["WEBHOOK-URL"]
+            self.betteruptime_times = betteruptime_config["HOW-OFTEN"]
+        else:
+            pass
