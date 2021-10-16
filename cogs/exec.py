@@ -1,0 +1,25 @@
+from discord.ext.commands import AutoShardedBot, Cog
+from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option
+
+
+class Exec(Cog):
+    def __init__(self, bot: AutoShardedBot):
+        self.bot = bot
+
+    @cog_ext.cog_slash(name="exec", description="Execute some command", options=[
+        create_option(
+            name="command",
+            description="The command you want to run",
+            option_type=3,
+            required=True
+        )
+    ])
+    async def exec_command(self, ctx: SlashContext, **kwargs):
+        # still work in progress
+        print(f"kwargs: {kwargs}")
+        await ctx.send("done")
+
+
+def setup(bot: AutoShardedBot):
+    bot.add_cog(Exec(bot))

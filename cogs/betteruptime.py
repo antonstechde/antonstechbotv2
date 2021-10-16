@@ -11,11 +11,11 @@ class Betteruptime(Cog):
 
 
 # So this checks if it should use the Betteruptime Function
-if utils.CONFIG.betteruptime_enabled == "true" or utils.CONFIG.betteruptime_enabled == "TRUE":
+if utils.CONFIG.better_uptime_enabled == "true" or utils.CONFIG.better_uptime_enabled == "TRUE":
 
-    @tasks.loop(minutes=int(utils.CONFIG.betteruptime_times))
+    @tasks.loop(minutes=int(utils.CONFIG.better_uptime_times))
     async def send_request():
-        requests.get(utils.CONFIG.betteruptime_url)
+        requests.get(utils.CONFIG.better_uptime_url)
 
     send_request.start()
 

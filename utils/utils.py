@@ -1,7 +1,8 @@
 import pathlib
 from utils.config import Config
 
-CONFIG: Config = None
+
+CONFIG = None
 
 
 def get_project_dir() -> str:
@@ -15,3 +16,6 @@ def get_project_dir() -> str:
 def run_checks():
     global CONFIG
     CONFIG = Config()
+
+
+

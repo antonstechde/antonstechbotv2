@@ -14,6 +14,10 @@ class Config:
         self.DATABASE_USER = None
         self.DATABASE_PASSWORD = None
 
+        self.better_uptime_enabled = None
+        self.better_uptime_url = None
+        self.better_uptime_times = None
+
         self.setup()
 
     def setup(self):
@@ -29,10 +33,11 @@ class Config:
         self.DATABASE_HOST = database_config["HOST"]
         self.DATABASE_NAME = database_config["DATABASE"]
 
-        betteruptime_config = self.__config_parser__["BETTERUPTIME-INTEGRATION"]
-        self.betteruptime_enabled = betteruptime_config["ENABLED"]
-        if self.betteruptime_enabled == "true":
-            self.betteruptime_url = betteruptime_config["WEBHOOK-URL"]
-            self.betteruptime_times = betteruptime_config["HOW-OFTEN"]
+        better_uptime_config = self.__config_parser__["BETTERUPTIME-INTEGRATION"]
+
+        self.better_uptime_enabled = better_uptime_config["ENABLED"]
+        if self.better_uptime_enabled == "true":
+            self.better_uptime_url = better_uptime_config["WEBHOOK-URL"]
+            self.better_uptime_times = better_uptime_config["HOW-OFTEN"]
         else:
             pass

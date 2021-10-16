@@ -1,4 +1,4 @@
-from discord.ext.commands import Bot, Cog
+from discord.ext.commands import AutoShardedBot, Cog
 from discord_slash import cog_ext, SlashContext
 import os
 import psutil
@@ -9,7 +9,7 @@ uname = platform.uname()
 
 
 class Status(Cog):
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: AutoShardedBot):
         self.bot = bot
 
     @cog_ext.cog_slash(name="status", description="Displays Information about the Bot")
@@ -17,14 +17,14 @@ class Status(Cog):
         pid = os.getpid()
         process = psutil.Process(pid)
         process.create_time()
-        memoryuse = process.memory_full_info()
+        memory_use = process.memory_full_info()
         await ctx.send(f"```prolog\n"
                        f"Discord Stuff:\n"
                        f"Servers: {len(self.bot.guilds)}\n"
                        f"Users: {len(set(self.bot.get_all_members()))}\n"
                        "-------\n"
                        f"Bot Technical:\n"
-                       f"RAM-Usage: {memoryuse.rss / 1024000} MB \n"
+                       f"RAM-Usage: {memory_use.rss / 1024000} MB \n"
                        f'Running Since: {time.strftime("%d.%m.%Y %H:%M", time.localtime(process.create_time()))}\n'
                        f"Websocket Latency: {round(self.bot.latency * 1000)}ms\n"
                        f"Shard Count: {len(list(self.bot.shards))}\n"
@@ -37,5 +37,5 @@ class Status(Cog):
                        f"```")
 
 
-def setup(bot: Bot):
+def setup(bot: AutoShardedBot):
     bot.add_cog(Status(bot))

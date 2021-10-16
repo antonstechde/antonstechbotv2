@@ -12,5 +12,6 @@ class Slash(Cog):
         embed = Embed(title="Embed Test")
         await ctx.send(embed=embed)
 
+
 def setup(bot: Bot):
     bot.add_cog(Slash(bot))
