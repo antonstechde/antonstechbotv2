@@ -15,7 +15,7 @@ import asyncio
 bot = AutoShardedBot(command_prefix="!", self_bot=True, intents=Intents.default())
 bot.remove_command("help")
 
-slash = SlashCommand(bot, sync_commands=True)
+slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
 utils.run_checks()
 
