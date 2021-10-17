@@ -6,4 +6,4 @@ config/config.ini
 
 test/
 
-logs/*
+logs/
