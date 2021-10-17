@@ -52,7 +52,7 @@ def main():
         while True:
             await bot.change_presence(activity=discord.Game("https://git.io/techbotv2"),
                                       status=discord.Status.online)
-            utils.LOGGER.debug("Changed bot presence to 'https://git.io/techbotv2")
+            utils.LOGGER.debug("Changed bot presence to 'https://git.io/techbotv2'")
             await asyncio.sleep(60)
             await bot.change_presence(
                 activity=discord.Game("on " + str(len(bot.guilds)) + " Servers"))
