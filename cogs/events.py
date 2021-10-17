@@ -1,4 +1,4 @@
-import asyncio
+from discord import Guild
 from discord.ext.commands import Cog, Bot
 from discord.ext import commands
 from utils import utils
@@ -18,6 +18,18 @@ class Events(Cog):
                                            f'Try it out by Typing "/" in this Channel :)')
         except IndexError:
             pass
+
+    @commands.Cog.listener()
+    async def on_error(self, event, *args, **kwargs):
+        utils.LOGGER.error(f"Discord.py error: \nEvent: {event}\n*args: {args}\n**kwargs: {kwargs}")
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild: Guild):
+        utils.LOGGER.info(f"Joined guild '{guild.name}' ({guild.id})")
+
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild: Guild):
+        utils.LOGGER.info(f"Left guild '{guild.name}' ({guild.id})")
 
 
 def setup(bot):

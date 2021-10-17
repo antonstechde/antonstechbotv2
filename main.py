@@ -35,17 +35,6 @@ def main():
 
         bot.loop.create_task(status_task())
 
-    @bot.event
-    async def on_error(event, *args, **kwargs):
-        utils.LOGGER.error(f"Discord.py error: \nEvent: {event}\n*args: {args}\n**kwargs: {kwargs}")
-
-    @bot.event
-    async def on_guild_join(guild: Guild):
-        utils.LOGGER.info(f"Joined guild '{guild.name}' ({guild.id})")
-
-    @bot.event
-    async def on_guild_remove(guild: Guild):
-        utils.LOGGER.info(f"Left guild '{guild.name}' ({guild.id})")
 
     async def status_task():
         while True:
