@@ -3,3 +3,7 @@
 __pycache__/
 
 config/config.ini
+
+test/
+
+logs/*
