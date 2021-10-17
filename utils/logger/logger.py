@@ -7,7 +7,8 @@ from datetime import datetime
 from colorama import Style
 from threading import Lock
 
-from utils.error_levels import DebugLevel, ErrorLevel, WarningLevel, InfoLevel, Level
+from utils.logger.error_levels import DebugLevel
+from utils.logger.error_levels import Level, InfoLevel, ErrorLevel, WarningLevel
 
 
 class Logger:
@@ -17,7 +18,7 @@ class Logger:
 
         sys.excepthook = self.custom_sys_except_hook
 
-        self.__log_path__ = str(pathlib.Path(__file__).parent.parent.absolute()) + "/logs"
+        self.__log_path__ = str(pathlib.Path(__file__).parent.parent.parent.absolute()) + "/logs"
         self.__lock__ = Lock()
 
         if should_log_to_file:

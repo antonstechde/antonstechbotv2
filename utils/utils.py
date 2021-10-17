@@ -1,11 +1,12 @@
 import pathlib
 from utils.config import Config
-from utils import logger
-from utils.error_levels import DebugLevel, InfoLevel, WarningLevel, ErrorLevel, Level
-
+from utils.logger import logger
+from utils.logger.error_levels import Level, InfoLevel, ErrorLevel, WarningLevel, DebugLevel
+from utils.dbConnector.Connector import Connector
 
 CONFIG: Config
 LOGGER: logger.Logger
+dbCONNECTOR: Connector
 
 
 def get_project_dir() -> str:
@@ -17,7 +18,7 @@ def get_project_dir() -> str:
 
 
 def run_checks():
-    global CONFIG, LOGGER
+    global CONFIG, LOGGER, dbCONNECTOR
     CONFIG = Config()
 
     error_level: Level.Level
@@ -35,6 +36,14 @@ def run_checks():
         error_level = InfoLevel.InfoLevel()
 
     LOGGER = logger.Logger(should_log_to_file=True, only_print_over_and_including_severity=error_level)
+
+    dbCONNECTOR = Connector(
+        database=CONFIG.DATABASE_NAME,
+        user=CONFIG.DATABASE_USER,
+        password=CONFIG.DATABASE_PASSWORD,
+        port=CONFIG.DATABASE_PORT,
+        host=CONFIG.DATABASE_HOST
+    )
 
 
 
