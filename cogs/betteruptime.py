@@ -8,19 +8,19 @@ import asyncio
 class Betteruptime(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
+        self.run()
+        utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
+    @staticmethod
+    def run():
+        # So this checks if it should use the Betteruptime Function
+        if utils.CONFIG.better_uptime_enabled:
 
-# So this checks if it should use the Betteruptime Function
-if utils.CONFIG.better_uptime_enabled == "true" or utils.CONFIG.better_uptime_enabled == "TRUE":
+            @tasks.loop(minutes=int(utils.CONFIG.better_uptime_times))
+            async def send_request():
+                requests.get(utils.CONFIG.better_uptime_url)
 
-    @tasks.loop(minutes=int(utils.CONFIG.better_uptime_times))
-    async def send_request():
-        requests.get(utils.CONFIG.better_uptime_url)
-
-    send_request.start()
-
-else:
-    pass
+            send_request.start()
 
 
 def setup(bot):

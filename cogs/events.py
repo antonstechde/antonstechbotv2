@@ -1,12 +1,13 @@
 import asyncio
 from discord.ext.commands import Cog, Bot
 from discord.ext import commands
-from utils import config
+from utils import utils
 
 
 class Events(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
+        utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
     @commands.Cog.listener()
     async def on_message(self, message):

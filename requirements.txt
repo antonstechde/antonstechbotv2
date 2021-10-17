@@ -1,3 +1,4 @@
 discord-py-interactions
 psutil>=5.6.6
 requests==2.26.0
+colorama==0.4.4

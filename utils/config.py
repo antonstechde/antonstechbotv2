@@ -1,6 +1,6 @@
 import configparser
 from utils import utils
-from configparser import *
+
 
 class Config:
     def __init__(self):
@@ -8,6 +8,8 @@ class Config:
         self.__config_parser__.read(utils.get_project_dir() + "/config/config.ini")
 
         self.TOKEN = None
+        self.LOG_LEVEL = None
+
         self.DATABASE_PORT = None
         self.DATABASE_HOST = None
         self.DATABASE_NAME = None
@@ -24,6 +26,7 @@ class Config:
         bot_config = self.__config_parser__["BOT"]
 
         self.TOKEN = bot_config["TOKEN"]
+        self.LOG_LEVEL = bot_config["LOG_SEVERITY"]
 
         database_config = self.__config_parser__["DATABASE"]
 
@@ -35,8 +38,8 @@ class Config:
 
         better_uptime_config = self.__config_parser__["BETTERUPTIME-INTEGRATION"]
 
-        self.better_uptime_enabled = better_uptime_config["ENABLED"]
-        if self.better_uptime_enabled == "true":
+        self.better_uptime_enabled = better_uptime_config["ENABLED"].lower() in ["true"]
+        if self.better_uptime_enabled:
             self.better_uptime_url = better_uptime_config["WEBHOOK-URL"]
             self.better_uptime_times = better_uptime_config["HOW-OFTEN"]
         else:
