@@ -26,7 +26,7 @@ class PrivateChannel(Cog):
             "required": "false"
         }
 
-    ], guild_ids=[761304285798989896])
+    ])
     async def private_channel(self, ctx: SlashContext, **kwargs):
         # still work in progress
         print(f"kwargs: {kwargs}")
