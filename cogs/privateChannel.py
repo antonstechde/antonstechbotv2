@@ -2,7 +2,7 @@ from discord.ext.commands import AutoShardedBot, Cog
 from discord.ext import commands, tasks
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option
-
+import psycopg2
 from utils import utils
 
 
@@ -11,7 +11,7 @@ class PrivateChannel(Cog):
         self.bot = bot
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
-    @cog_ext.cog_slash(name="private_channel", description="Some private channel command", options=[
+    @cog_ext.cog_slash(name="channel", description="Allows you to create Private Channels :)", options=[
         {
             "name": "create",
             "description": "Create a private channel",
@@ -21,16 +21,65 @@ class PrivateChannel(Cog):
 
         {
             "name": "delete",
-            "description": "Delete a private channel",
+            "description": "Delete your own private Channel",
+            "type": 3,
+            "required": "false"
+        },
+
+        {
+            "name": "allow",
+            "description": "Allow a Person to join in your Channel",
+            "type": 6,
+            "required": "false"
+        },
+
+        {
+            "name": "deny",
+            "description": "Disallow a Person from joining your Channel",
+            "type": 6,
+            "required": "false"
+        },
+
+        {
+            "name": "remove",
+            "description": "(ADMIN ONLY) remove a Channel",
+            "type": 6,
+            "required": "false"
+        },
+
+        {
+            "name": "on/off",
+            "description": "(ADMIN ONLY) lets you turn on or off the whole function",
+            "type": 3,
+            "required": "false"
+        },
+
+        {
+            "name": "category",
+            "description": "(ADMIN ONLY) lets you set the Category where Channels should be created",
             "type": 3,
             "required": "false"
         }
 
+
     ])
     async def private_channel(self, ctx: SlashContext, **kwargs):
-        # still work in progress
-        print(f"kwargs: {kwargs}")
-        await ctx.send("test")
+        if "create" in kwargs:
+            print("...")
+        elif "delete" in kwargs:
+            print("...")
+        elif "allow" in kwargs:
+            print("...")
+        elif "deny" in kwargs:
+            print("...")
+        elif "remove" in kwargs:
+            print(...)
+        elif "on/off" in kwargs:
+            print("...")
+        elif "category" in kwargs:
+            print("...")
+        else:
+            await ctx.send("Invalid Option")
 
 
 def setup(bot: AutoShardedBot):
