@@ -33,7 +33,7 @@ class Logger:
 
     @staticmethod
     def __get_format__() -> str:
-        return f"{datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        return f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
 
     def __print_message__(self, level: Level.Level, message):
         if level.severity_number >= self.__only_print_over_and_including_severity__.severity_number:

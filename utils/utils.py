@@ -1,12 +1,16 @@
 import pathlib
+
+import discord_slash
+
 from utils.config import Config
 from utils.logger import logger
 from utils.logger.error_levels import Level, InfoLevel, ErrorLevel, WarningLevel, DebugLevel
 from utils.dbConnector.Connector import Connector
+import discord
 
 CONFIG: Config
 LOGGER: logger.Logger
-dbCONNECTOR: Connector
+DB_CONNECTOR: Connector
 
 
 def get_project_dir() -> str:
@@ -17,8 +21,20 @@ def get_project_dir() -> str:
     return str(pathlib.Path(__file__).parent.parent.absolute())
 
 
+def return_embed(ctx: discord_slash.SlashContext, name, content, color: discord.Color) -> discord.Embed:
+    embed = discord.Embed(color=color, timestamp=ctx.created_at)
+    embed.add_field(name=name, value=content, inline=False)
+    return embed
+
+
+async def get_emoji(guild: discord.guild.Guild, input_to_get):
+    emoji: discord.Emoji = await guild.fetch_emoji(input_to_get)
+
+    return emoji
+
+
 def run_checks():
-    global CONFIG, LOGGER, dbCONNECTOR
+    global CONFIG, LOGGER, DB_CONNECTOR
     CONFIG = Config()
 
     error_level: Level.Level
@@ -37,13 +53,15 @@ def run_checks():
 
     LOGGER = logger.Logger(should_log_to_file=True, only_print_over_and_including_severity=error_level)
 
-    dbCONNECTOR = Connector(
+    DB_CONNECTOR = Connector(
         database=CONFIG.DATABASE_NAME,
         user=CONFIG.DATABASE_USER,
         password=CONFIG.DATABASE_PASSWORD,
         port=CONFIG.DATABASE_PORT,
         host=CONFIG.DATABASE_HOST
     )
+
+    DB_CONNECTOR.connect()
 
 
 
