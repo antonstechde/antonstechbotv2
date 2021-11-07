@@ -1,6 +1,9 @@
 import discord
 from discord.ext.commands import Cog, AutoShardedBot
-from discord_slash import cog_ext, SlashContext
+from discord_slash import cog_ext, SlashContext, ButtonStyle, ComponentContext
+from discord_slash.utils import manage_components
+from discord_slash.utils.manage_components import wait_for_component
+
 from utils import utils
 
 
@@ -13,7 +16,65 @@ class ServerUtils(Cog):
         self.bot: AutoShardedBot = bot
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="punish", description="punishes a user")
+    pun_opt = [
+        {
+            "name": "user",
+            "description": "The user to punish",
+            "required": True,
+            "type": 6
+        }
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="punish", description="punishes a user", options=pun_opt)
+    async def _user_punish(self, ctx: SlashContext, user: discord.User):
+        await ctx.defer()
+        user_setbtn1 = [
+            manage_components.create_button(
+                label="BAN", style=ButtonStyle.red, custom_id="BAN"
+            ),
+            manage_components.create_button(
+                label="KICK", style=ButtonStyle.red, custom_id="KICK"
+            ),
+        ]
+        user_setbtn2 = [
+            manage_components.create_button(
+                label="WARN", style=ButtonStyle.blue, custom_id="WARN"
+            ),
+            manage_components.create_button(
+                label="MUTE", style=ButtonStyle.blue, custom_id="MUTE"
+            ),
+        ]
+        user_setbtn3 = [
+            manage_components.create_button(
+                label="Do nothing", style=ButtonStyle.gray, custom_id="nothing"
+            )
+        ]
+        user_buttons_actionrow1 = manage_components.create_actionrow(*user_setbtn1)
+        user_buttons_actionrow2 = manage_components.create_actionrow(*user_setbtn2)
+        user_buttons_actionrow3 = manage_components.create_actionrow(*user_setbtn3)
+
+        if (
+                not ctx.author.guild_permissions.ban_members
+                or not ctx.author.guild_permissions.kick_members
+        ):
+            for i in range(2):
+                user_buttons_actionrow1["components"][i]["disabled"] = True
+        if not ctx.author.guild_permissions.manage_messages:
+            for i in range(2):
+                user_buttons_actionrow2["components"][i]["disabled"] = True
+        await ctx.send(
+            f"What do you want to do with {user.mention}?",
+            hidden=False,
+            components=[
+                user_buttons_actionrow1,
+                user_buttons_actionrow2,
+                user_buttons_actionrow3,
+            ],
+        )
+        buttons: ComponentContext = await wait_for_component(self.bot, components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3])
+
+
+
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="add-role", description="adds a role to a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="remove-role", description="removes a role from a user")
