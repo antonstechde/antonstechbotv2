@@ -9,40 +9,13 @@ class RoleReactions(Cog):
         self.bot: AutoShardedBot = bot
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
-    @cog_ext.cog_slash(name="role_reaction", description="manage role reactions", options=[{
-        "name": "create",
-        "description": "Create a role reaction",
-        "type": 1,
-        "required": "false",
-        "options": [
-            {
-                "name": "channel",
-                "description": "the id of the channel the message is in",
-                "type": 7,
-                "required": "true"
-            },
-            {
-                "name": "message",
-                "description": "the id of the message in the channel to react",
-                "type": 3,
-                "required": "true"
-            },
-            {
-                "name": "emoji",
-                "description": "the id of the emoji which should be used",
-                "type": 3,
-                "required": "true"
-            },
-            {
-                "name": "role",
-                "description": "the id of the role which should be given",
-                "type": 8,
-                "required": "true"
-            }
-        ]
-    }])
-    async def role_reactions(self, ctx: SlashContext, **kwargs):
-        print(**kwargs)
+    @cog_ext.cog_subcommand(base="role_reaction", name="create", description="Create a role reaction")
+    async def role_reactions_create(self, ctx: SlashContext, **kwargs):
+        print(str(kwargs))
+
+    @cog_ext.cog_subcommand(base="role_reaction", name="delete", description="Delete a role reaction")
+    async def role_reaction_delete(self, ctx:SlashContext, **kwargs):
+        print(str(kwargs))
 
 
 def setup(bot: AutoShardedBot):
