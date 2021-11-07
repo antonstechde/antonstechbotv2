@@ -29,6 +29,7 @@ class Minecraft(Cog):
 
         ])
     async def minecraft_commands(self, ctx: SlashContext, **kwargs):
+        await ctx.defer(hidden=False)
         try:
             playername = kwargs["skin"]
             uuid = "https://api.mojang.com/users/profiles/minecraft/" + playername

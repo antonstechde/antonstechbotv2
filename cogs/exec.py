@@ -19,9 +19,10 @@ class Exec(Cog):
         )
     ])
     async def exec_command(self, ctx: SlashContext, **kwargs):
+        await ctx.defer(hidden=True)
         # still work in progress
         print(f"kwargs: {kwargs}")
-        await ctx.send("done")
+        await ctx.send("done", hidden=True)
 
 
 def setup(bot: AutoShardedBot):
