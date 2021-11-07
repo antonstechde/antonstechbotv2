@@ -49,12 +49,10 @@ def main():
             await asyncio.sleep(60)
             utils.LOGGER.debug("Changed bot presence to 'your messages'")
 
-    for file in os.listdir(utils.get_project_dir() + "/cogs/"):
-        if os.path.isdir(utils.get_project_dir() + "/cogs/" + file):
-            continue
-
-        utils.LOGGER.debug(f"Attempting to load cog {file[:-3]}")
-        bot.load_extension(f"cogs.{file[:-3]}")
+    for filename in os.listdir(utils.get_project_dir() + "/cogs/"):
+        if filename.endswith(".py") and filename not in ["basicerror.py"]:
+            utils.LOGGER.debug(f"Attempting to load cog {filename[:-3]}")
+            bot.load_extension(f"cogs.{filename[:-3]}")
 
     bot.run(utils.CONFIG.TOKEN)
 
