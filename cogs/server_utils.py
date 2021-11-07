@@ -29,6 +29,7 @@ class ServerUtils(Cog):
 
     @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="punish", description="punishes a user", options=pun_opt)
     async def _user_punish(self, ctx: SlashContext, user: discord.User):
+        # add moderator permission restriction
         await ctx.defer(hidden=False)
         # This command is **not** hidden, so the user can see that he is being punished
         user_setbtn1 = [
@@ -76,7 +77,7 @@ class ServerUtils(Cog):
         )
 
         try:
-            buttons: ComponentContext = await wait_for_component(self.bot, components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3], timeout=60)
+            buttons: ComponentContext = await wait_for_component(self.bot, components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3], timeout=60, check=lambda: ctx.author.id == buttons.author.id)
         except asyncio.TimeoutError:
             for i in range(2):
                 user_buttons_actionrow1["components"][i]["disabled"]=True
@@ -84,6 +85,16 @@ class ServerUtils(Cog):
             user_buttons_actionrow2["components"][0]["disabled"]=True
             await message.edit(content="Timed out.", components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3]) # Disable the Buttons
             return
+
+        if buttons.component_id == "mute":
+            ...  # do your own mute stuff here
+
+        if buttons.component_id == "warn":
+            ...  # do your own warn stuff here
+
+        if buttons.component_id == "kick":
+            # await user.kick(reason=
+            ...  # do your own kick stuff with embeds or what you want
 
 
 
