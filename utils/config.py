@@ -20,6 +20,8 @@ class Config:
         self.better_uptime_url = None
         self.better_uptime_times = None
 
+        self.memes_api_url = None
+
         self.setup()
 
     def setup(self):
@@ -44,3 +46,5 @@ class Config:
             self.better_uptime_times = better_uptime_config["HOW-OFTEN"]
         else:
             pass
+
+        self.memes_api_url = "https://meme-api.herokuapp.com/gimme"

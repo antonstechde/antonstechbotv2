@@ -52,7 +52,7 @@ class PrivateChannel(Cog):
         },
 
         {
-            "name": "on or off",
+            "name": "on-or-off",
             "description": "(ADMIN ONLY) lets you turn on or off the whole function",
             "type": 3,
             "required": "false"
