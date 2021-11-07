@@ -5,7 +5,7 @@ from discord.channel import TextChannel
 from discord.emoji import Emoji
 from discord.role import Role
 from discord.ext import commands
-from discord.errors import Forbidden
+from discord.errors import Forbidden, NotFound
 
 from utils import utils
 
@@ -19,9 +19,7 @@ class RoleReactions(Cog):
     async def role_reactions_create(self, ctx: SlashContext, channel: TextChannel, message: str, emoji: Emoji, role: Role):
         await ctx.defer()
 
-        member: discord.Member = await ctx.guild.fetch_member(ctx.author.id)
-
-        if not member.guild_permissions.administrator:
+        if not ctx.author.guild_permissions.administrator:
             await ctx.send(embed=utils.return_embed(ctx, "Insufficient permissions!", "This command can only be run by administrators!", discord.Color.red()))
             return
 
@@ -31,9 +29,9 @@ class RoleReactions(Cog):
             await ctx.send(embed=utils.return_embed(ctx, "Error", "The message id is not a number!", discord.Color.red()))
             return
 
-        fetched_message: discord.Message = await channel.fetch_message(message)
-
-        if fetched_message is None:
+        try:
+            fetched_message: discord.Message = await channel.fetch_message(message)
+        except NotFound:
             await ctx.send(embed=utils.return_embed(ctx, "Error", "The message was not found!", discord.Color.red()))
             return
 
