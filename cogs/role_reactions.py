@@ -16,6 +16,7 @@ class RoleReactions(Cog):
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
     @cog_ext.cog_subcommand(base="role_reaction", name="create", description="Create a role reaction")
+    @commands.has_permissions(administrator=True)
     async def role_reactions_create(self, ctx: SlashContext, channel: TextChannel, message: str, emoji: Emoji, role: Role):
         await ctx.defer()
 
