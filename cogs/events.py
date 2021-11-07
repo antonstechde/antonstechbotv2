@@ -1,7 +1,9 @@
+import discord.ext.commands.errors
 from discord import Guild
 from discord.ext.commands import Cog, Bot
 from discord.ext import commands
 from utils import utils
+from discord.ext.commands.errors import MissingPermissions
 
 
 class Events(Cog):
@@ -26,6 +28,11 @@ class Events(Cog):
     @commands.Cog.listener()
     async def on_slash_command_error(self, event, *args, **kwargs):
         # catch slash command errors
+        error, = args
+        if isinstance(error, MissingPermissions):
+            await event.send(embed=utils.return_embed(event, "Insufficient Permissions!", "You don't have enough permissions to run this command!", discord.Color.red()))
+            return
+
         utils.LOGGER.error(f"Discord-Interactions error: \nEvent: {event}\n*args: {args}\n**kwargs: {kwargs}")
 
     @commands.Cog.listener()
