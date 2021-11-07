@@ -18,7 +18,7 @@ def main():
     bot = AutoShardedBot(command_prefix="!", self_bot=True, intents=Intents.all())
     bot.remove_command("help")
 
-    SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
+    SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True, debug_guild=761304285798989896)
 
     @bot.event
     async def on_ready():
