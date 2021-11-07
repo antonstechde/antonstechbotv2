@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 from discord.ext.commands import Cog, AutoShardedBot
 from discord_slash import cog_ext, SlashContext, ButtonStyle, ComponentContext
@@ -27,7 +29,8 @@ class ServerUtils(Cog):
 
     @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="punish", description="punishes a user", options=pun_opt)
     async def _user_punish(self, ctx: SlashContext, user: discord.User):
-        await ctx.defer()
+        await ctx.defer(hidden=False)
+        # This command is **not** hidden, so the user can see that he is being punished
         user_setbtn1 = [
             manage_components.create_button(
                 label="BAN", style=ButtonStyle.red, custom_id="BAN"
@@ -62,8 +65,8 @@ class ServerUtils(Cog):
         if not ctx.author.guild_permissions.manage_messages:
             for i in range(2):
                 user_buttons_actionrow2["components"][i]["disabled"] = True
-        await ctx.send(
-            f"What do you want to do with {user.mention}?",
+        message = await ctx.send(
+            f"What do you want to do with {user.mention}? (timeout: 60 seconds)",
             hidden=False,
             components=[
                 user_buttons_actionrow1,
@@ -71,7 +74,16 @@ class ServerUtils(Cog):
                 user_buttons_actionrow3,
             ],
         )
-        buttons: ComponentContext = await wait_for_component(self.bot, components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3])
+
+        try:
+            buttons: ComponentContext = await wait_for_component(self.bot, components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3], timeout=60)
+        except asyncio.TimeoutError:
+            for i in range(2):
+                user_buttons_actionrow1["components"][i]["disabled"]=True
+                user_buttons_actionrow2["components"][i]["disabled"]=True
+            user_buttons_actionrow2["components"][0]["disabled"]=True
+            await message.edit(content="Timed out.", components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3]) # Disable the Buttons
+            return
 
 
 
