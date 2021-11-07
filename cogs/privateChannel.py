@@ -67,6 +67,7 @@ class PrivateChannel(Cog):
 
     ])
     async def private_channel(self, ctx: SlashContext, **kwargs):
+        await ctx.defer(hidden=True)
         if "create" in kwargs:
             print("...")
         elif "delete" in kwargs:
@@ -82,7 +83,7 @@ class PrivateChannel(Cog):
         elif "category" in kwargs:
             print("...")
         else:
-            await ctx.send("Invalid Option")
+            await ctx.send("Invalid Option", hidden=True)
 
 
 def setup(bot: AutoShardedBot):

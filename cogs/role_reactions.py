@@ -17,7 +17,7 @@ class RoleReactions(Cog):
 
     @cog_ext.cog_subcommand(base="role_reaction", name="create", description="Create a role reaction")
     async def role_reactions_create(self, ctx: SlashContext, channel: TextChannel, message: str, emoji: Emoji, role: Role):
-        await ctx.defer()
+        await ctx.defer(hidden=False)
 
         if not ctx.author.guild_permissions.administrator:
             await ctx.send(embed=utils.return_embed(ctx, "Insufficient permissions!", "This command can only be run by administrators!", discord.Color.red()))

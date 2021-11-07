@@ -24,6 +24,11 @@ class Events(Cog):
         utils.LOGGER.error(f"Discord.py error: \nEvent: {event}\n*args: {args}\n**kwargs: {kwargs}")
 
     @commands.Cog.listener()
+    async def on_slash_command_error(self, event, *args, **kwargs):
+        # catch slash command errors
+        utils.LOGGER.error(f"Discord-Interactions error: \nEvent: {event}\n*args: {args}\n**kwargs: {kwargs}")
+
+    @commands.Cog.listener()
     async def on_guild_join(self, guild: Guild):
         utils.LOGGER.info(f"Joined guild '{guild.name}' ({guild.id})")
 

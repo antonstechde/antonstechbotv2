@@ -18,6 +18,7 @@ class Status(Cog):
 
     @cog_ext.cog_slash(name="status", description="Displays Information about the Bot")
     async def _status(self, ctx: SlashContext):
+        await ctx.defer(hidden=True)
         pid = os.getpid()
         process = psutil.Process(pid)
         process.create_time()
@@ -38,7 +39,7 @@ class Status(Cog):
                        f"RAM-Usage : {psutil.virtual_memory()[2]}%\n"
                        f"OS: {uname.system} {uname.version}\n"
                        f"System Architecture: {uname.machine}\n"
-                       f"```")
+                       f"```", hidden=True)
 
 
 def setup(bot: AutoShardedBot):

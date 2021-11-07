@@ -12,6 +12,7 @@ class Memes(Cog):
 
     @cog_ext.cog_slash(name="memes", description="Sends you a random Meme")
     async def memes_commands(self, ctx: SlashContext):
+        await ctx.defer(hidden=False)
         response = requests.get(utils.CONFIG.memes_api_url)
         x = response.json()
         link = x["postLink"]
