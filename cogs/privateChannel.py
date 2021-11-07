@@ -5,6 +5,10 @@ from discord_slash.utils.manage_commands import create_option
 import psycopg2
 from utils import utils
 
+utils.LOGGER.debug(f"Trying to connect to the database at {utils.CONFIG.DATABASE_HOST}")
+# Connect do database
+utils.LOGGER.debug(f"Successfully connected to {utils.CONFIG.DATABASE_HOST}")
+
 
 class PrivateChannel(Cog):
     def __init(self, bot: AutoShardedBot):
@@ -48,7 +52,7 @@ class PrivateChannel(Cog):
         },
 
         {
-            "name": "on/off",
+            "name": "on or off",
             "description": "(ADMIN ONLY) lets you turn on or off the whole function",
             "type": 3,
             "required": "false"
@@ -60,7 +64,6 @@ class PrivateChannel(Cog):
             "type": 3,
             "required": "false"
         }
-
 
     ])
     async def private_channel(self, ctx: SlashContext, **kwargs):

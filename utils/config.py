@@ -4,7 +4,7 @@ from utils import utils
 
 class Config:
     def __init__(self):
-        self.__config_parser__ = configparser.ConfigParser()
+        self.__config_parser__ = configparser.ConfigParser(interpolation=None)
         self.__config_parser__.read(utils.get_project_dir() + "/config/config.ini")
 
         self.TOKEN = None
