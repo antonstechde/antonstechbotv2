@@ -16,9 +16,14 @@ class RoleReactions(Cog):
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
     @cog_ext.cog_subcommand(base="role_reaction", name="create", description="Create a role reaction")
-    @commands.has_permissions(administrator=True)
     async def role_reactions_create(self, ctx: SlashContext, channel: TextChannel, message: str, emoji: Emoji, role: Role):
         await ctx.defer()
+
+        member: discord.Member = await ctx.guild.fetch_member(ctx.author.id)
+
+        if not member.guild_permissions.administrator:
+            await ctx.send(embed=utils.return_embed(ctx, "Insufficient permissions!", "This command can only be run by administrators!", discord.Color.red()))
+            return
 
         try:
             message = int(message)
