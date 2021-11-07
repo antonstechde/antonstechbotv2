@@ -1,5 +1,7 @@
 import psycopg2
 
+from psycopg2.extensions import cursor
+
 
 class Connector:
     def __init__(self, host: str, user: str, database: str, password: str, port: str):
@@ -20,5 +22,11 @@ class Connector:
             port=self.port
         )
 
-    def get_new_cursor(self):
+    def get_new_cursor(self) -> cursor:
         return self.connection.cursor()
+
+    def close(self):
+        self.connection.close()
+
+    def commit(self):
+        self.connection.commit()

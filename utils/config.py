@@ -44,7 +44,5 @@ class Config:
         if self.better_uptime_enabled:
             self.better_uptime_url = better_uptime_config["WEBHOOK-URL"]
             self.better_uptime_times = better_uptime_config["HOW-OFTEN"]
-        else:
-            pass
 
         self.memes_api_url = "https://meme-api.herokuapp.com/gimme"

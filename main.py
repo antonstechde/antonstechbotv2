@@ -3,7 +3,6 @@ import os
 
 import discord
 from discord import Intents
-from discord import Guild
 from discord.ext.commands import AutoShardedBot
 from discord_slash import SlashCommand, __version__
 
@@ -19,7 +18,7 @@ def main():
     bot = AutoShardedBot(command_prefix="!", self_bot=True, intents=Intents.all())
     bot.remove_command("help")
 
-    slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
+    SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
     @bot.event
     async def on_ready():
@@ -34,7 +33,6 @@ def main():
         utils.LOGGER.info(config_string)
 
         bot.loop.create_task(status_task())
-
 
     async def status_task():
         while True:
@@ -63,4 +61,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
