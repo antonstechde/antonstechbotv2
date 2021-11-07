@@ -87,7 +87,368 @@ class ServerUtils(Cog):
             return
 
         if buttons.component_id == "mute":
-            ...  # do your own mute stuff here
+            mute_btn = [
+                manage_components.create_button(
+                    label="Minutes", style=ButtonStyle.red, custom_id="m"
+                ),
+                manage_components.create_button(
+                    label="Hours", style=ButtonStyle.red, custom_id="h"
+                ),
+                manage_components.create_button(
+                    label="Days", style=ButtonStyle.red, custom_id="d"
+                ),
+                manage_components.create_button(
+                    label="Cancel", style=ButtonStyle.gray, custom_id="c"
+                ),
+            ]
+            mute_actionrow = manage_components.create_actionrow(*mute_btn)
+            await buttons.edit_origin(
+                content="Do you want to mute the user for a minutes, hours or days?",
+                hidden=True,
+                components=[mute_actionrow],
+            )
+            mute_btn_ctx: ComponentContext = await manage_components.wait_for_component(
+                self.bot, components=mute_actionrow
+            )
+            if mute_btn_ctx.author != invoker:
+                await ctx.channel.send(
+                    f"{ctx.author.mention},you can't use this buttons, you didn't invoke the command",
+                    delete_after=10,
+                )
+                return
+            if mute_btn_ctx.component_id == "c":
+                for i in range(4):
+                    mute_actionrow["components"][i]["disabled"] = True
+                await mute_btn_ctx.edit_origin(
+                    content="ok, cancelled", hidden=True, components=[mute_actionrow]
+                )
+            if mute_btn_ctx.component_id == "m":
+                times1 = [
+                    manage_components.create_button(
+                        label="5", style=ButtonStyle.red, custom_id="5"
+                    ),
+                    manage_components.create_button(
+                        label="10", style=ButtonStyle.red, custom_id="10"
+                    ),
+                    manage_components.create_button(
+                        label="15", style=ButtonStyle.red, custom_id="15"
+                    ),
+                    manage_components.create_button(
+                        label="20", style=ButtonStyle.red, custom_id="20"
+                    ),
+                ]
+                times2 = [
+                    manage_components.create_button(
+                        label="25", style=ButtonStyle.red, custom_id="25"
+                    ),
+                    manage_components.create_button(
+                        label="30", style=ButtonStyle.red, custom_id="30"
+                    ),
+                    manage_components.create_button(
+                        label="35", style=ButtonStyle.red, custom_id="35"
+                    ),
+                    manage_components.create_button(
+                        label="40", style=ButtonStyle.red, custom_id="40"
+                    ),
+                ]
+                times3 = [
+                    manage_components.create_button(
+                        label="45", style=ButtonStyle.red, custom_id="45"
+                    ),
+                    manage_components.create_button(
+                        label="50", style=ButtonStyle.red, custom_id="50"
+                    ),
+                    manage_components.create_button(
+                        label="55", style=ButtonStyle.red, custom_id="55"
+                    ),
+                    manage_components.create_button(
+                        label="60", style=ButtonStyle.red, custom_id="60"
+                    ),
+                ]
+
+                times1_row = manage_components.create_actionrow(*times1)
+                times2_row = manage_components.create_actionrow(*times2)
+                times3_row = manage_components.create_actionrow(*times3)
+                await mute_btn_ctx.edit_origin(
+                    content="Select the duration of the mute!",
+                    hidden=True,
+                    components=[times1_row, times2_row, times3_row],
+                )
+                times_ctx: ComponentContext = await manage_components.wait_for_component(
+                    self.bot, components=[times1_row, times2_row, times3_row]
+                )
+                if times_ctx.author != invoker:
+                    await ctx.channel.send(
+                        f"{ctx.author.mention},you can't use this buttons, you didn't invoke the command",
+                        delete_after=10,
+                    )
+                    return
+                for i in range(4):
+                    times1_row["components"][i]["disabled"] = True
+                    times2_row["components"][i]["disabled"] = True
+                    times3_row["components"][i]["disabled"] = True
+                dur = int(times_ctx.component_id)
+                await times_ctx.edit_origin(
+                    content=f"{user.mention} is going to be muted for {dur} minutes",
+                    hidden=False,
+                    components=[times1_row, times2_row, times3_row],
+                )
+                await SlashMuting(ctx, use, dur, "m")
+
+            if mute_btn_ctx.component_id == "h":
+                times1 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=1, custom_id="1"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=2, custom_id="2"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=3, custom_id="3"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=4, custom_id="4"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=5, custom_id="5"
+                    ),
+                ]
+                times2 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=6, custom_id="6"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=7, custom_id="7"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=8, custom_id="8"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=9, custom_id="9"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=10, custom_id="10"
+                    ),
+                ]
+                times3 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=11, custom_id="11"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=12, custom_id="12"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=13, custom_id="13"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=14, custom_id="14"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=15, custom_id="15"
+                    ),
+                ]
+                times4 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=16, custom_id="16"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=17, custom_id="17"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=18, custom_id="18"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=19, custom_id="19"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=20, custom_id="20"
+                    ),
+                ]
+                times5 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=21, custom_id="21"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=22, custom_id="22"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=23, custom_id="23"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=24, custom_id="24"
+                    ),
+                ]
+
+                times1_row = manage_components.create_actionrow(*times1)
+                times2_row = manage_components.create_actionrow(*times2)
+                times3_row = manage_components.create_actionrow(*times3)
+                times4_row = manage_components.create_actionrow(*times4)
+                times5_row = manage_components.create_actionrow(*times5)
+                await mute_btn_ctx.edit_origin(
+                    content="Select the duration of the mute!",
+                    hidden=True,
+                    components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                )
+                times_ctx: ComponentContext = await manage_components.wait_for_component(
+                    self.bot,
+                    components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                )
+                if times_ctx.author != invoker:
+                    await ctx.channel.send(
+                        f"{ctx.author.mention},you can't use this buttons, you didn't invoke the command",
+                        delete_after=10,
+                    )
+                    return
+                for i in range(5):
+                    times1_row["components"][i]["disabled"] = True
+                    times2_row["components"][i]["disabled"] = True
+                    times3_row["components"][i]["disabled"] = True
+                    times4_row["components"][i]["disabled"] = True
+                for i in range(4):
+                    times5_row["components"][i]["disabled"] = True
+                dur = int(times_ctx.component_id)
+                await times_ctx.edit_origin(
+                    content=f"{user.mention} is going to be muted for {dur} hours",
+                    hidden=False,
+                    components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                )
+                await SlashMuting(ctx, use, dur, "h")
+            if mute_btn_ctx.component_id == "d":
+                times1 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=1, custom_id="1"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=2, custom_id="2"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=3, custom_id="3"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=4, custom_id="4"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=5, custom_id="5"
+                    ),
+                ]
+                times2 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=6, custom_id="6"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=7, custom_id="7"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=8, custom_id="8"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=9, custom_id="9"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=10, custom_id="10"
+                    ),
+                ]
+                times3 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=11, custom_id="11"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=12, custom_id="12"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=13, custom_id="13"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=14, custom_id="14"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=15, custom_id="15"
+                    ),
+                ]
+                times4 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=16, custom_id="16"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=17, custom_id="17"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=18, custom_id="18"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=19, custom_id="19"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=20, custom_id="20"
+                    ),
+                ]
+                times5 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=21, custom_id="21"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=22, custom_id="22"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=23, custom_id="23"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=24, custom_id="24"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=25, custom_id="25"
+                    ),
+                ]
+                times6 = [
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=26, custom_id="26"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=27, custom_id="27"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=28, custom_id="28"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=29, custom_id="29"
+                    ),
+                    manage_components.create_button(
+                        style=ButtonStyle.red, label=30, custom_id="30"
+                    ),
+                ]
+                times1_row = manage_components.create_actionrow(*times1)
+                times2_row = manage_components.create_actionrow(*times2)
+                times3_row = manage_components.create_actionrow(*times3)
+                times4_row = manage_components.create_actionrow(*times4)
+                times5_row = manage_components.create_actionrow(*times5)
+                await mute_btn_ctx.edit_origin(
+                    content="Select the duration of the mute!",
+                    hidden=True,
+                    components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                )
+                times_ctx: ComponentContext = await manage_components.wait_for_component(
+                    self.bot,
+                    components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                )
+                if times_ctx.author != invoker:
+                    await ctx.channel.send(
+                        f"{ctx.author.mention},you can't use this buttons, you didn't invoke the command",
+                        delete_after=10,
+                    )
+                    return
+                for i in range(5):
+                    times1_row["components"][i]["disabled"] = True
+                    times2_row["components"][i]["disabled"] = True
+                    times3_row["components"][i]["disabled"] = True
+                    times4_row["components"][i]["disabled"] = True
+                    times5_row["components"][i]["disabled"] = True
+                dur = int(times_ctx.component_id)
+                await times_ctx.edit_origin(
+                    content=f"{user.mention} is going to be muted for {dur} days",
+                    hidden=False,
+                    components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                )
+                await SlashMuting(ctx, use, dur, "d")
 
         if buttons.component_id == "warn":
             ...  # do your own warn stuff here
