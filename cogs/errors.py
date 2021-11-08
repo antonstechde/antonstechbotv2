@@ -12,14 +12,8 @@ class Errors(commands.Cog):
         @client.event
         async def on_command_error(ctx: SlashContext, error):
             await ctx.defer(hidden=True)
-            if isinstance(error, CommandNotFound):
-                embed = discord.Embed(title="Command not Found!", colour=discord.Colour.red())
-                embed.set_footer(text="With /help you can see which Commands the Bot has")
-                await ctx.send(embed=embed)
-            elif isinstance(error, MissingPermissions):
+            if isinstance(error, MissingPermissions):
                 await ctx.send("You dont have Permissions for that! ")
-            elif isinstance(error, MissingRequiredArgument):
-                await ctx.send("Something is missing :wink:")
             elif isinstance(error, MemberNotFound):
                 await ctx.send("This User doesn't exist!")
             elif isinstance(error, CommandOnCooldown):
