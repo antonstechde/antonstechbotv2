@@ -6,7 +6,7 @@ from discord_slash import cog_ext, SlashContext, ButtonStyle, ComponentContext
 from discord_slash.utils import manage_components
 from discord_slash.utils.manage_components import wait_for_component
 
-from utils import utils
+from utils import utils, punishments
 
 
 class ServerUtils(Cog):
@@ -34,18 +34,18 @@ class ServerUtils(Cog):
         # This command is **not** hidden, so the user can see that he is being punished
         user_setbtn1 = [
             manage_components.create_button(
-                label="BAN", style=ButtonStyle.red, custom_id="BAN"
+                label="BAN", style=ButtonStyle.red, custom_id="ban"
             ),
             manage_components.create_button(
-                label="KICK", style=ButtonStyle.red, custom_id="KICK"
+                label="KICK", style=ButtonStyle.red, custom_id="kick"
             ),
         ]
         user_setbtn2 = [
             manage_components.create_button(
-                label="WARN", style=ButtonStyle.blue, custom_id="WARN"
+                label="WARN", style=ButtonStyle.blue, custom_id="warn"
             ),
             manage_components.create_button(
-                label="MUTE", style=ButtonStyle.blue, custom_id="MUTE"
+                label="MUTE", style=ButtonStyle.blue, custom_id="mute"
             ),
         ]
         user_setbtn3 = [
@@ -60,12 +60,8 @@ class ServerUtils(Cog):
         if (
                 not ctx.author.guild_permissions.ban_members
                 or not ctx.author.guild_permissions.kick_members
-        ):
-            for i in range(2):
-                user_buttons_actionrow1["components"][i]["disabled"] = True
-        if not ctx.author.guild_permissions.manage_messages:
-            for i in range(2):
-                user_buttons_actionrow2["components"][i]["disabled"] = True
+                or not ctx.author.guild_permissions.manage_messages ):
+            raise discord.ext.commands.MissingPermissions # raise some error you like
         message = await ctx.send(
             f"What do you want to do with {user.mention}? (timeout: 60 seconds)",
             hidden=False,
@@ -108,14 +104,8 @@ class ServerUtils(Cog):
                 components=[mute_actionrow],
             )
             mute_btn_ctx: ComponentContext = await manage_components.wait_for_component(
-                self.bot, components=mute_actionrow
+                self.bot, components=mute_actionrow, check=lambda: mute_btn_ctx.author.id == ctx.author.id
             )
-            if mute_btn_ctx.author != invoker:
-                await ctx.channel.send(
-                    f"{ctx.author.mention},you can't use this buttons, you didn't invoke the command",
-                    delete_after=10,
-                )
-                return
             if mute_btn_ctx.component_id == "c":
                 for i in range(4):
                     mute_actionrow["components"][i]["disabled"] = True
@@ -175,14 +165,8 @@ class ServerUtils(Cog):
                     components=[times1_row, times2_row, times3_row],
                 )
                 times_ctx: ComponentContext = await manage_components.wait_for_component(
-                    self.bot, components=[times1_row, times2_row, times3_row]
+                    self.bot, components=[times1_row, times2_row, times3_row], check=lambda: ctx.author.id == times_ctx.author.id
                 )
-                if times_ctx.author != invoker:
-                    await ctx.channel.send(
-                        f"{ctx.author.mention},you can't use this buttons, you didn't invoke the command",
-                        delete_after=10,
-                    )
-                    return
                 for i in range(4):
                     times1_row["components"][i]["disabled"] = True
                     times2_row["components"][i]["disabled"] = True
@@ -193,7 +177,7 @@ class ServerUtils(Cog):
                     hidden=False,
                     components=[times1_row, times2_row, times3_row],
                 )
-                await SlashMuting(ctx, use, dur, "m")
+                await punishments.mute(ctx, user,dur, "m")
 
             if mute_btn_ctx.component_id == "h":
                 times1 = [
@@ -291,14 +275,8 @@ class ServerUtils(Cog):
                 )
                 times_ctx: ComponentContext = await manage_components.wait_for_component(
                     self.bot,
-                    components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                    components=[times1_row, times2_row, times3_row, times4_row, times5_row], check=lambda: ctx.author.id == times_ctx.author.id
                 )
-                if times_ctx.author != invoker:
-                    await ctx.channel.send(
-                        f"{ctx.author.mention},you can't use this buttons, you didn't invoke the command",
-                        delete_after=10,
-                    )
-                    return
                 for i in range(5):
                     times1_row["components"][i]["disabled"] = True
                     times2_row["components"][i]["disabled"] = True
@@ -312,7 +290,7 @@ class ServerUtils(Cog):
                     hidden=False,
                     components=[times1_row, times2_row, times3_row, times4_row, times5_row],
                 )
-                await SlashMuting(ctx, use, dur, "h")
+                await punishments.mute(ctx, user, dur, "h")
             if mute_btn_ctx.component_id == "d":
                 times1 = [
                     manage_components.create_button(
@@ -424,18 +402,12 @@ class ServerUtils(Cog):
                 await mute_btn_ctx.edit_origin(
                     content="Select the duration of the mute!",
                     hidden=True,
-                    components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                    components=[times1_row, times2_row, times3_row, times4_row, times5_row]
                 )
                 times_ctx: ComponentContext = await manage_components.wait_for_component(
                     self.bot,
-                    components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                    components=[times1_row, times2_row, times3_row, times4_row, times5_row], check=lambda: ctx.author.id == times_ctx.author.id
                 )
-                if times_ctx.author != invoker:
-                    await ctx.channel.send(
-                        f"{ctx.author.mention},you can't use this buttons, you didn't invoke the command",
-                        delete_after=10,
-                    )
-                    return
                 for i in range(5):
                     times1_row["components"][i]["disabled"] = True
                     times2_row["components"][i]["disabled"] = True
@@ -448,7 +420,7 @@ class ServerUtils(Cog):
                     hidden=False,
                     components=[times1_row, times2_row, times3_row, times4_row, times5_row],
                 )
-                await SlashMuting(ctx, use, dur, "d")
+                await punishments.mute(ctx, user, dur, "d")
 
         if buttons.component_id == "warn":
             ...  # do your own warn stuff here
