@@ -7,8 +7,7 @@ from utils import utils
 
 adminperms = {
     723220208772186156: [  # nur auf dem antonstech.de dc server
-        create_permission(819476372867121173, SlashCommandPermissionType.ROLE, True),  # Programming-Stuff role
-        create_permission(782026258921553933, SlashCommandPermissionType.ROLE, True),  # Admin role
+        create_permission(782026258921553933, SlashCommandPermissionType.ROLE, True)  # Admin role
     ]
 }
 
