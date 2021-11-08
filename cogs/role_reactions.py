@@ -75,11 +75,13 @@ class RoleReactions(Cog):
         sql = "select role_id from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s"
         cursor.execute(sql, (channel_id, message_id, emoji.name))
 
-        role_id, = cursor.fetchone()
+        role_id = cursor.fetchone()
 
         if role_id is None:
             # no entries found, shouldn't happen
             return
+
+        role_id, = role_id
 
         role: Role = guild.get_role(role_id)
 
@@ -113,11 +115,13 @@ class RoleReactions(Cog):
         sql = "select role_id from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s"
         cursor.execute(sql, (channel_id, message_id, emoji.name))
 
-        role_id, = cursor.fetchone()
+        role_id = cursor.fetchone()
 
         if role_id is None:
             # no entries found
             return
+
+        role_id, = role_id
 
         role: Role = guild.get_role(role_id)
 
