@@ -32,7 +32,12 @@ class RoleReactions(Cog):
             await ctx.send(embed=utils.return_embed(ctx, "Error", "The message was not found!", discord.Color.red()))
             return
 
-        await fetched_message.add_reaction(emoji)
+        # if the reaction is already on the message, this will handle it
+
+        try:
+            fetched_message.reactions.index(emoji)
+        except ValueError:
+            await fetched_message.add_reaction(emoji)
 
         cursor = utils.DB_CONNECTOR.get_new_cursor()
 
