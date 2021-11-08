@@ -16,7 +16,7 @@ class Weather(Cog):
 
     @cog_ext.cog_slash(name="weather", description="Lets you display the current Weather in a City",
                        options=[{
-                           "name": "weather",
+                           "name": "City",
                            "description": "Please provide your City here",
                            "type": 3,
                            "required": "true"
