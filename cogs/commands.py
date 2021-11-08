@@ -2,7 +2,13 @@ import discord
 from discord import Embed
 from discord.ext.commands import Bot, Cog
 from discord_slash import cog_ext, SlashContext
+from config.adminconfig import get_admin_permissions
 from utils import utils
+from discord.ext import commands
+
+
+def ist_gepinnt(message):
+    return not message.pinned
 
 
 class Commands(Cog):
@@ -29,6 +35,24 @@ class Commands(Cog):
         embed.set_author(name=f"Currently we only have a few Votes but you can vote for us here :D",
                          url="https://top.gg/bot/744218316167708773/vote")
         await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(name="shutdown", description="Shuts down the bot",
+                       default_permission=False, permissions=get_admin_permissions())
+    async def _shutdown(self, ctx: SlashContext):
+        await ctx.send("Shutting down...")
+        await self.bot.logout()
+
+    @cog_ext.cog_slash(name="clear", description="Clears the chat")
+    @commands.has_permissions(manage_messages=True)
+    async def clear_command(self, ctx: SlashContext, amount: int = 7):
+        try:
+            amount = int(amount)
+            await ctx.channel.purge(limit=amount + 1, check=ist_gepinnt)
+            await ctx.send(f"{amount} Messages were deleted by {ctx.author} :)", delete_after=7)
+        except TypeError:
+            await ctx.send("Invalid amount of messages to delete")
+            return
+
 
 
 def setup(bot: Bot):
