@@ -40,7 +40,7 @@ class RoleReactions(Cog):
         sql = "select role_id from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s"
         cursor.execute(sql, (channel.id, fetched_message.id, emoji))
 
-        role_id, = cursor.fetchone()
+        role_id = cursor.fetchone()
 
         if role_id is not None:
             sql = "delete from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s and role_id = %s"
