@@ -47,8 +47,11 @@ def main():
             await asyncio.sleep(60)
             await bot.change_presence(
                 activity=discord.Activity(type=discord.ActivityType.watching, name="your Messages"))
-            await asyncio.sleep(60)
             utils.LOGGER.debug("Changed bot presence to 'your messages'")
+            await asyncio.sleep(60)
+            await bot.change_presence(
+                activity=discord.Activity(type=discord.ActivityType.listening, name="to you talking in voice channels"))
+            utils.LOGGER.debug("Changed bot presence to 'to you talking in voice channels'")
 
     for filename in os.listdir(utils.get_project_dir() + "/cogs/"):
         if filename.endswith(".py") and filename not in ["basicerror.py"]:
