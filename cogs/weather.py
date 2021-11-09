@@ -23,7 +23,7 @@ class Weather(Cog):
                        }])
     async def _wetter_command(self, ctx: SlashContext, **kwargs):
         await ctx.defer(hidden=False)
-        city = kwargs["weather"]
+        city = kwargs["city"]
         try:
             complete_url = self.base_url + "appid=" + self.api_key + "&q=" + city + "&lang=en"
             response = requests.get(complete_url).json()
