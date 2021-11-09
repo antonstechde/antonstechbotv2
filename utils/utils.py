@@ -2,10 +2,10 @@ import pathlib
 
 import discord_slash
 
-from utils.config import Config
-from utils.logger import logger
-from utils.logger.error_levels import Level, InfoLevel, ErrorLevel, WarningLevel, DebugLevel
-from utils.dbConnector.Connector import Connector
+from .config import Config
+from .logger import logger
+from .logger.error_levels import Level, InfoLevel, ErrorLevel, WarningLevel, DebugLevel
+from .dbConnector.Connector import Connector
 import discord
 
 CONFIG: Config
