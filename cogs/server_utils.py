@@ -29,7 +29,7 @@ class ServerUtils(Cog):
 
     @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="punish", description="punishes a user",
                             options=pun_opt)
-    async def _user_punish(self, ctx: SlashContext, user: discord.User):
+    async def _user_punish(self, ctx: SlashContext, user: discord.Member):
         # add moderator permission restriction
         await ctx.defer(hidden=False)
         # This command is **not** hidden, so the user can see that he is being punished
@@ -456,10 +456,41 @@ class ServerUtils(Cog):
         if buttons.component_id == "warn":
             await buttons.edit_origin(content="please send a message with the reason of the warning! (timeout: 600s)",
                                       components=[])
-            a = self.bot.wait_for("message", check= lambda msg: msg.author.id == buttons.author.id, timeout=600)
+            try:
+                a = self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
+            except asyncio.TimeoutError:
+                await buttons.origin_message.edit("Timed out, process canceled.")
+                return
+            reason = str(a.content)
+            await a.delete()
+            await buttons.origin_message.delete()
+            await punishments.warn(ctx, user, reason)
 
         if buttons.component_id == "kick":
-            ...
+            await buttons.edit_origin(content="please send a message with the reason of the kick! (timeout: 600s)",
+                                      components=[])
+            try:
+                a = self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
+            except asyncio.TimeoutError:
+                await buttons.origin_message.edit("Timed out, process canceled.")
+                return
+            reason = str(a.content)
+            await a.delete()
+            await buttons.origin_message.delete()
+            await punishments.kick(ctx, user, reason)
+
+        if buttons.component_id == "ban":
+            await buttons.edit_origin(content="please send a message with the reason of the ban! (timeout: 600s)",
+                                      components=[])
+            try:
+                a = self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
+            except asyncio.TimeoutError:
+                await buttons.origin_message.edit("Timed out, process canceled.")
+                return
+            reason = str(a.content)
+            await a.delete()
+            await buttons.origin_message.delete()
+            await punishments.ban(ctx, user, reason)
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="unban", description="unbans a user")
