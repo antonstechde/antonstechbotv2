@@ -22,12 +22,13 @@ def main():
 
     @bot.event
     async def on_ready():
-        server_string = '        \n'.join([guild.name for guild in bot.guilds])
+        server_names = [guild.name for guild in bot.guilds]
+        final_server_names = ", ".join(server_names)
         config_string = f"""Information:
     - Logged in as {bot.user}
     - discord-py-interaction version: {__version__}
-    - Is in servers:
-        {server_string}
+    - Is in the following {str(len(bot.guilds))} servers:
+        {final_server_names}
         """
 
         utils.LOGGER.info(config_string)

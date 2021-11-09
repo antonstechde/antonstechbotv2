@@ -32,7 +32,12 @@ class RoleReactions(Cog):
             await ctx.send(embed=utils.return_embed(ctx, "Error", "The message was not found!", discord.Color.red()))
             return
 
-        await fetched_message.add_reaction(emoji)
+        # if the reaction is already on the message, this will handle it
+
+        try:
+            fetched_message.reactions.index(emoji)
+        except ValueError:
+            await fetched_message.add_reaction(emoji)
 
         cursor = utils.DB_CONNECTOR.get_new_cursor()
 
@@ -40,7 +45,7 @@ class RoleReactions(Cog):
         sql = "select role_id from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s"
         cursor.execute(sql, (channel.id, fetched_message.id, emoji))
 
-        role_id, = cursor.fetchone()
+        role_id = cursor.fetchone()
 
         if role_id is not None:
             sql = "delete from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s and role_id = %s"
@@ -75,11 +80,13 @@ class RoleReactions(Cog):
         sql = "select role_id from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s"
         cursor.execute(sql, (channel_id, message_id, emoji.name))
 
-        role_id, = cursor.fetchone()
+        role_id = cursor.fetchone()
 
         if role_id is None:
             # no entries found, shouldn't happen
             return
+
+        role_id, = role_id
 
         role: Role = guild.get_role(role_id)
 
@@ -113,11 +120,13 @@ class RoleReactions(Cog):
         sql = "select role_id from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s"
         cursor.execute(sql, (channel_id, message_id, emoji.name))
 
-        role_id, = cursor.fetchone()
+        role_id = cursor.fetchone()
 
         if role_id is None:
             # no entries found
             return
+
+        role_id, = role_id
 
         role: Role = guild.get_role(role_id)
 
