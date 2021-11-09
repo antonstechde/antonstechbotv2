@@ -7,7 +7,7 @@ from discord_slash.utils import manage_components
 from discord_slash.utils.manage_components import wait_for_component
 
 from utils import utils, punishments
-
+guildid = [723220208772186156]
 
 class ServerUtils(Cog):
     """
@@ -457,7 +457,7 @@ class ServerUtils(Cog):
             await buttons.edit_origin(content="please send a message with the reason of the warning! (timeout: 600s)",
                                       components=[])
             try:
-                a = self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
+                a = await self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
             except asyncio.TimeoutError:
                 await buttons.origin_message.edit("Timed out, process canceled.")
                 return
@@ -470,7 +470,7 @@ class ServerUtils(Cog):
             await buttons.edit_origin(content="please send a message with the reason of the kick! (timeout: 600s)",
                                       components=[])
             try:
-                a = self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
+                a = await self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
             except asyncio.TimeoutError:
                 await buttons.origin_message.edit("Timed out, process canceled.")
                 return
@@ -483,7 +483,7 @@ class ServerUtils(Cog):
             await buttons.edit_origin(content="please send a message with the reason of the ban! (timeout: 600s)",
                                       components=[])
             try:
-                a = self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
+                a = await self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
             except asyncio.TimeoutError:
                 await buttons.origin_message.edit("Timed out, process canceled.")
                 return
