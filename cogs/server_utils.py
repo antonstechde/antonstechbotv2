@@ -9,6 +9,7 @@ from discord_slash.utils.manage_components import wait_for_component
 from utils import utils, punishments
 guildid = [723220208772186156]
 
+
 class ServerUtils(Cog):
     """
     This class is supposed to contain a lot of server based stuff like "channel create/delete" or "user punish/unpunish"
@@ -180,7 +181,7 @@ class ServerUtils(Cog):
                         times1_row["components"][i]["disabled"] = True
                         times2_row["components"][i]["disabled"] = True
                         times3_row["components"][i]["disabled"] = True
-                    await mute_btn_ctx.edit_origin(
+                    await mute_btn_ctx.origin_message.edit(
                         content="Timed out.", hidden=True, components=[times1_row, times2_row, times3_row]
                     )
                     return
@@ -305,7 +306,7 @@ class ServerUtils(Cog):
                         times4_row["components"][i]["disabled"] = True
                     for i in range(4):
                         times5_row["components"][i]["disabled"] = True
-                    await mute_btn_ctx.edit_origin(
+                    await mute_btn_ctx.origin_message.edit(
                         content="Timed out.", hidden=True, 
                         components=[times1_row, times2_row, times3_row, times4_row, times5_row]
                     )
@@ -434,7 +435,7 @@ class ServerUtils(Cog):
                         times3_row["components"][i]["disabled"] = True
                         times4_row["components"][i]["disabled"] = True
                         times5_row["components"][i]["disabled"] = True
-                    await mute_btn_ctx.edit_origin(
+                    await mute_btn_ctx.origin_message.edit(
                         content="Timed out.", hidden=True, 
                         components=[times1_row, times2_row, times3_row, times4_row, times5_row]
                     )
