@@ -83,7 +83,7 @@ class ServerUtils(Cog):
             for i in range(2):
                 user_buttons_actionrow1["components"][i]["disabled"] = True
                 user_buttons_actionrow2["components"][i]["disabled"] = True
-            user_buttons_actionrow2["components"][0]["disabled"] = True
+            user_buttons_actionrow3["components"][0]["disabled"] = True
             await message.edit(content="Timed out.", components=[user_buttons_actionrow1, user_buttons_actionrow2,
                                                                  user_buttons_actionrow3])  # Disable the Buttons
             return
