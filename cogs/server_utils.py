@@ -78,7 +78,7 @@ class ServerUtils(Cog):
                                                                                        user_buttons_actionrow2,
                                                                                        user_buttons_actionrow3],
                                                                  timeout=60,
-                                                                 check=lambda: ctx.author.id == buttons.author.id)
+                                                                 check=lambda msg: ctx.author.id == msg.author.id)
         except asyncio.TimeoutError:
             for i in range(2):
                 user_buttons_actionrow1["components"][i]["disabled"] = True
@@ -110,7 +110,7 @@ class ServerUtils(Cog):
                 components=[mute_actionrow],
             )
             mute_btn_ctx: ComponentContext = await manage_components.wait_for_component(
-                self.bot, components=mute_actionrow, check=lambda: mute_btn_ctx.author.id == ctx.author.id
+                self.bot, components=mute_actionrow, check=lambda msg: msg.author.id == buttons.author.id
             )
             if mute_btn_ctx.component_id == "c":
                 for i in range(4):
@@ -173,7 +173,7 @@ class ServerUtils(Cog):
                 try:
                     times_ctx: ComponentContext = await manage_components.wait_for_component(
                         self.bot, components=[times1_row, times2_row, times3_row],
-                        check=lambda: ctx.author.id == times_ctx.author.id, timeout=180,
+                        check=lambda msg: msg.author.id == mute_btn_ctx.author.id, timeout=180,
                     )
                 except asyncio.TimeoutError:
                     for i in range(4):
@@ -294,7 +294,7 @@ class ServerUtils(Cog):
                     times_ctx: ComponentContext = await manage_components.wait_for_component(
                         self.bot,
                         components=[times1_row, times2_row, times3_row, times4_row, times5_row],
-                        check=lambda: ctx.author.id == times_ctx.author.id,
+                        check=lambda msg: mute_btn_ctx.author.id == msg.author.id,
                         timeout=180
                     )
                 except asyncio.TimeoutError:
@@ -424,7 +424,7 @@ class ServerUtils(Cog):
                     times_ctx: ComponentContext = await manage_components.wait_for_component(
                         self.bot,
                         components=[times1_row, times2_row, times3_row, times4_row, times5_row],
-                        check=lambda: ctx.author.id == times_ctx.author.id,
+                        check=lambda msg: mute_btn_ctx.author.id == msg.author.id,
                         timeout=180
                     )
                 except asyncio.TimeoutError:
@@ -454,7 +454,9 @@ class ServerUtils(Cog):
                 await punishments.mute(ctx, user, dur, "d")
 
         if buttons.component_id == "warn":
-            ...  # do your own warn stuff here
+            await buttons.edit_origin(content="please send a message with the reason of the warning! (timeout: 600s)",
+                                      components=[])
+            a = self.bot.wait_for("message", check= lambda msg: msg.author.id == buttons.author.id, timeout=600)
 
         if buttons.component_id == "kick":
             ...
