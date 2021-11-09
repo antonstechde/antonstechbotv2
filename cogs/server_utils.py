@@ -492,8 +492,13 @@ class ServerUtils(Cog):
             await buttons.origin_message.delete()
             await punishments.ban(ctx, user, reason)
 
+    @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="unban", description="unbans a user")
+    async def _unban(self, ctx: SlashContext, user_id: int, reason: str):
+        user: discord.User = await self.bot.fetch_user(user_id)
+        await ctx.guild.unban(user=user, reason=reason)
+        await ctx.send(f"unbanned {user.mention}!")
+
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="unban", description="unbans a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="add-role", description="adds a role to a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="remove-role", description="removes a role from a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role")
