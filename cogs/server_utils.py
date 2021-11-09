@@ -9,6 +9,7 @@ from discord_slash.utils.manage_components import wait_for_component
 from utils import utils, punishments
 guildid = [723220208772186156]
 
+
 class ServerUtils(Cog):
     """
     This class is supposed to contain a lot of server based stuff like "channel create/delete" or "user punish/unpunish"
@@ -60,8 +61,8 @@ class ServerUtils(Cog):
 
         if (
                 not ctx.author.guild_permissions.ban_members
-                or not ctx.author.guild_permissions.kick_members
-                or not ctx.author.guild_permissions.manage_messages):
+                and not ctx.author.guild_permissions.kick_members
+                and not ctx.author.guild_permissions.manage_messages):
             raise discord.ext.commands.MissingPermissions  # raise some error you like
         message = await ctx.send(
             f"What do you want to do with {user.mention}? (timeout: 60 seconds)",
@@ -83,7 +84,7 @@ class ServerUtils(Cog):
             for i in range(2):
                 user_buttons_actionrow1["components"][i]["disabled"] = True
                 user_buttons_actionrow2["components"][i]["disabled"] = True
-            user_buttons_actionrow2["components"][0]["disabled"] = True
+            user_buttons_actionrow3["components"][0]["disabled"] = True
             await message.edit(content="Timed out.", components=[user_buttons_actionrow1, user_buttons_actionrow2,
                                                                  user_buttons_actionrow3])  # Disable the Buttons
             return
@@ -180,7 +181,7 @@ class ServerUtils(Cog):
                         times1_row["components"][i]["disabled"] = True
                         times2_row["components"][i]["disabled"] = True
                         times3_row["components"][i]["disabled"] = True
-                    await mute_btn_ctx.edit_origin(
+                    await mute_btn_ctx.origin_message.edit(
                         content="Timed out.", hidden=True, components=[times1_row, times2_row, times3_row]
                     )
                     return
@@ -305,7 +306,7 @@ class ServerUtils(Cog):
                         times4_row["components"][i]["disabled"] = True
                     for i in range(4):
                         times5_row["components"][i]["disabled"] = True
-                    await mute_btn_ctx.edit_origin(
+                    await mute_btn_ctx.origin_message.edit(
                         content="Timed out.", hidden=True, 
                         components=[times1_row, times2_row, times3_row, times4_row, times5_row]
                     )
@@ -434,7 +435,7 @@ class ServerUtils(Cog):
                         times3_row["components"][i]["disabled"] = True
                         times4_row["components"][i]["disabled"] = True
                         times5_row["components"][i]["disabled"] = True
-                    await mute_btn_ctx.edit_origin(
+                    await mute_btn_ctx.origin_message.edit(
                         content="Timed out.", hidden=True, 
                         components=[times1_row, times2_row, times3_row, times4_row, times5_row]
                     )

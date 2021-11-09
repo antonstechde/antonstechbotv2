@@ -32,7 +32,7 @@ class Commands(Cog):
     @cog_ext.cog_slash(name="vote", description="Here you can find a link to vote for our bot <3")
     async def _vote(self, ctx: SlashContext):
         embed = discord.Embed()
-        embed.set_author(name=f"Currently we only have a few Votes but you can vote for us here :D",
+        embed.set_author(name="Currently we only have a few Votes but you can vote for us here :D",
                          url="https://top.gg/bot/744218316167708773/vote")
         await ctx.send(embed=embed)
 

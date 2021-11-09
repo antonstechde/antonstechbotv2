@@ -19,7 +19,7 @@ class Betteruptime(Cog):
             @tasks.loop(minutes=int(utils.CONFIG.better_uptime_times))
             async def send_request():
                 requests.get(utils.CONFIG.better_uptime_url)
-                utils.LOGGER.debug(f"Successfully sent Heartbeat Webhook")
+                utils.LOGGER.debug("Successfully sent Heartbeat Webhook")
 
             send_request.start()
 

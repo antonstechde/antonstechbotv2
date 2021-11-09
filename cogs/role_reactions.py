@@ -112,7 +112,7 @@ class RoleReactions(Cog):
         member: discord.Member = await guild.fetch_member(user_id)
 
         if member is None:
-            utils.LOGGER.debug(f"Could not find member, not continuing in role-removing")
+            utils.LOGGER.debug("Could not find member, not continuing in role-removing")
             return
 
         cursor = utils.DB_CONNECTOR.get_new_cursor()
