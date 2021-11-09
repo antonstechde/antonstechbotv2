@@ -22,7 +22,7 @@ class cog_management(Cog):
         self.bot = bot
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
-    @cog_ext.cog_slash(name="cog", description="lets you reload, load and unload cogs", guild_ids=[792862721556480031])
+    @cog_ext.cog_slash(name="cog", description="lets you reload, load and unload cogs", default_permission=False, permissions=get_admin_permissions())
     async def _cog_management(self, ctx: SlashContext):
         await ctx.defer(hidden=False)
         options = [
