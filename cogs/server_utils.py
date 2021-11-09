@@ -27,7 +27,8 @@ class ServerUtils(Cog):
         }
     ]
 
-    @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="punish", description="punishes a user", options=pun_opt)
+    @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="punish", description="punishes a user",
+                            options=pun_opt)
     async def _user_punish(self, ctx: SlashContext, user: discord.User):
         # add moderator permission restriction
         await ctx.defer(hidden=False)
@@ -60,8 +61,8 @@ class ServerUtils(Cog):
         if (
                 not ctx.author.guild_permissions.ban_members
                 or not ctx.author.guild_permissions.kick_members
-                or not ctx.author.guild_permissions.manage_messages ):
-            raise discord.ext.commands.MissingPermissions # raise some error you like
+                or not ctx.author.guild_permissions.manage_messages):
+            raise discord.ext.commands.MissingPermissions  # raise some error you like
         message = await ctx.send(
             f"What do you want to do with {user.mention}? (timeout: 60 seconds)",
             hidden=False,
@@ -73,13 +74,18 @@ class ServerUtils(Cog):
         )
 
         try:
-            buttons: ComponentContext = await wait_for_component(self.bot, components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3], timeout=60, check=lambda: ctx.author.id == buttons.author.id)
+            buttons: ComponentContext = await wait_for_component(self.bot, components=[user_buttons_actionrow1,
+                                                                                       user_buttons_actionrow2,
+                                                                                       user_buttons_actionrow3],
+                                                                 timeout=60,
+                                                                 check=lambda: ctx.author.id == buttons.author.id)
         except asyncio.TimeoutError:
             for i in range(2):
-                user_buttons_actionrow1["components"][i]["disabled"]=True
-                user_buttons_actionrow2["components"][i]["disabled"]=True
-            user_buttons_actionrow2["components"][0]["disabled"]=True
-            await message.edit(content="Timed out.", components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3]) # Disable the Buttons
+                user_buttons_actionrow1["components"][i]["disabled"] = True
+                user_buttons_actionrow2["components"][i]["disabled"] = True
+            user_buttons_actionrow2["components"][0]["disabled"] = True
+            await message.edit(content="Timed out.", components=[user_buttons_actionrow1, user_buttons_actionrow2,
+                                                                 user_buttons_actionrow3])  # Disable the Buttons
             return
 
         if buttons.component_id == "mute":
@@ -160,13 +166,24 @@ class ServerUtils(Cog):
                 times2_row = manage_components.create_actionrow(*times2)
                 times3_row = manage_components.create_actionrow(*times3)
                 await mute_btn_ctx.edit_origin(
-                    content="Select the duration of the mute!",
+                    content="Select the duration of the mute! (timeout: 180s)",
                     hidden=True,
                     components=[times1_row, times2_row, times3_row],
                 )
-                times_ctx: ComponentContext = await manage_components.wait_for_component(
-                    self.bot, components=[times1_row, times2_row, times3_row], check=lambda: ctx.author.id == times_ctx.author.id
-                )
+                try:
+                    times_ctx: ComponentContext = await manage_components.wait_for_component(
+                        self.bot, components=[times1_row, times2_row, times3_row],
+                        check=lambda: ctx.author.id == times_ctx.author.id, timeout=180,
+                    )
+                except asyncio.TimeoutError:
+                    for i in range(4):
+                        times1_row["components"][i]["disabled"] = True
+                        times2_row["components"][i]["disabled"] = True
+                        times3_row["components"][i]["disabled"] = True
+                    await mute_btn_ctx.edit_origin(
+                        content="Timed out.", hidden=True, components=[times1_row, times2_row, times3_row]
+                    )
+                    return
                 for i in range(4):
                     times1_row["components"][i]["disabled"] = True
                     times2_row["components"][i]["disabled"] = True
@@ -177,89 +194,89 @@ class ServerUtils(Cog):
                     hidden=False,
                     components=[times1_row, times2_row, times3_row],
                 )
-                await punishments.mute(ctx, user,dur, "m")
+                await punishments.mute(ctx, user, dur, "m")
 
             if mute_btn_ctx.component_id == "h":
                 times1 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=1, custom_id="1"
+                        style=ButtonStyle.red, label="1", custom_id="1"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=2, custom_id="2"
+                        style=ButtonStyle.red, label="2", custom_id="2"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=3, custom_id="3"
+                        style=ButtonStyle.red, label="3", custom_id="3"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=4, custom_id="4"
+                        style=ButtonStyle.red, label="4", custom_id="4"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=5, custom_id="5"
+                        style=ButtonStyle.red, label="5", custom_id="5"
                     ),
                 ]
                 times2 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=6, custom_id="6"
+                        style=ButtonStyle.red, label="6", custom_id="6"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=7, custom_id="7"
+                        style=ButtonStyle.red, label="7", custom_id="7"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=8, custom_id="8"
+                        style=ButtonStyle.red, label="8", custom_id="8"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=9, custom_id="9"
+                        style=ButtonStyle.red, label="9", custom_id="9"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=10, custom_id="10"
+                        style=ButtonStyle.red, label="10", custom_id="10"
                     ),
                 ]
                 times3 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=11, custom_id="11"
+                        style=ButtonStyle.red, label="11", custom_id="11"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=12, custom_id="12"
+                        style=ButtonStyle.red, label="12", custom_id="12"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=13, custom_id="13"
+                        style=ButtonStyle.red, label="13", custom_id="13"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=14, custom_id="14"
+                        style=ButtonStyle.red, label="14", custom_id="14"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=15, custom_id="15"
+                        style=ButtonStyle.red, label="15", custom_id="15"
                     ),
                 ]
                 times4 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=16, custom_id="16"
+                        style=ButtonStyle.red, label="16", custom_id="16"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=17, custom_id="17"
+                        style=ButtonStyle.red, label="17", custom_id="17"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=18, custom_id="18"
+                        style=ButtonStyle.red, label="18", custom_id="18"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=19, custom_id="19"
+                        style=ButtonStyle.red, label="19", custom_id="19"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=20, custom_id="20"
+                        style=ButtonStyle.red, label="20", custom_id="20"
                     ),
                 ]
                 times5 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=21, custom_id="21"
+                        style=ButtonStyle.red, label="21", custom_id="21"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=22, custom_id="22"
+                        style=ButtonStyle.red, label="22", custom_id="22"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=23, custom_id="23"
+                        style=ButtonStyle.red, label="23", custom_id="23"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=24, custom_id="24"
+                        style=ButtonStyle.red, label="24", custom_id="24"
                     ),
                 ]
 
@@ -269,14 +286,30 @@ class ServerUtils(Cog):
                 times4_row = manage_components.create_actionrow(*times4)
                 times5_row = manage_components.create_actionrow(*times5)
                 await mute_btn_ctx.edit_origin(
-                    content="Select the duration of the mute!",
+                    content="Select the duration of the mute! (timeout: 180s)",
                     hidden=True,
                     components=[times1_row, times2_row, times3_row, times4_row, times5_row],
                 )
-                times_ctx: ComponentContext = await manage_components.wait_for_component(
-                    self.bot,
-                    components=[times1_row, times2_row, times3_row, times4_row, times5_row], check=lambda: ctx.author.id == times_ctx.author.id
-                )
+                try:
+                    times_ctx: ComponentContext = await manage_components.wait_for_component(
+                        self.bot,
+                        components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                        check=lambda: ctx.author.id == times_ctx.author.id,
+                        timeout=180
+                    )
+                except asyncio.TimeoutError:
+                    for i in range(5):
+                        times1_row["components"][i]["disabled"] = True
+                        times2_row["components"][i]["disabled"] = True
+                        times3_row["components"][i]["disabled"] = True
+                        times4_row["components"][i]["disabled"] = True
+                    for i in range(4):
+                        times5_row["components"][i]["disabled"] = True
+                    await mute_btn_ctx.edit_origin(
+                        content="Timed out.", hidden=True, 
+                        components=[times1_row, times2_row, times3_row, times4_row, times5_row]
+                    )
+                    return
                 for i in range(5):
                     times1_row["components"][i]["disabled"] = True
                     times2_row["components"][i]["disabled"] = True
@@ -294,104 +327,87 @@ class ServerUtils(Cog):
             if mute_btn_ctx.component_id == "d":
                 times1 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=1, custom_id="1"
+                        style=ButtonStyle.red, label="1", custom_id="1"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=2, custom_id="2"
+                        style=ButtonStyle.red, label="2", custom_id="2"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=3, custom_id="3"
+                        style=ButtonStyle.red, label="3", custom_id="3"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=4, custom_id="4"
+                        style=ButtonStyle.red, label="4", custom_id="4"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=5, custom_id="5"
+                        style=ButtonStyle.red, label="5", custom_id="5"
                     ),
                 ]
                 times2 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=6, custom_id="6"
+                        style=ButtonStyle.red, label="6", custom_id="6"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=7, custom_id="7"
+                        style=ButtonStyle.red, label="7", custom_id="7"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=8, custom_id="8"
+                        style=ButtonStyle.red, label="8", custom_id="8"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=9, custom_id="9"
+                        style=ButtonStyle.red, label="9", custom_id="9"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=10, custom_id="10"
+                        style=ButtonStyle.red, label="10", custom_id="10"
                     ),
                 ]
                 times3 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=11, custom_id="11"
+                        style=ButtonStyle.red, label="11", custom_id="11"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=12, custom_id="12"
+                        style=ButtonStyle.red, label="12", custom_id="12"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=13, custom_id="13"
+                        style=ButtonStyle.red, label="13", custom_id="13"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=14, custom_id="14"
+                        style=ButtonStyle.red, label="14", custom_id="14"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=15, custom_id="15"
+                        style=ButtonStyle.red, label="15", custom_id="15"
                     ),
                 ]
                 times4 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=16, custom_id="16"
+                        style=ButtonStyle.red, label="16", custom_id="16"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=17, custom_id="17"
+                        style=ButtonStyle.red, label="17", custom_id="17"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=18, custom_id="18"
+                        style=ButtonStyle.red, label="18", custom_id="18"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=19, custom_id="19"
+                        style=ButtonStyle.red, label="19", custom_id="19"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=20, custom_id="20"
+                        style=ButtonStyle.red, label="20", custom_id="20"
                     ),
                 ]
                 times5 = [
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=21, custom_id="21"
+                        style=ButtonStyle.red, label="21", custom_id="21"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=22, custom_id="22"
+                        style=ButtonStyle.red, label="22", custom_id="22"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=23, custom_id="23"
+                        style=ButtonStyle.red, label="23", custom_id="23"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=24, custom_id="24"
+                        style=ButtonStyle.red, label="24", custom_id="24"
                     ),
                     manage_components.create_button(
-                        style=ButtonStyle.red, label=25, custom_id="25"
-                    ),
-                ]
-                times6 = [
-                    manage_components.create_button(
-                        style=ButtonStyle.red, label=26, custom_id="26"
-                    ),
-                    manage_components.create_button(
-                        style=ButtonStyle.red, label=27, custom_id="27"
-                    ),
-                    manage_components.create_button(
-                        style=ButtonStyle.red, label=28, custom_id="28"
-                    ),
-                    manage_components.create_button(
-                        style=ButtonStyle.red, label=29, custom_id="29"
-                    ),
-                    manage_components.create_button(
-                        style=ButtonStyle.red, label=30, custom_id="30"
+                        style=ButtonStyle.red, label="25", custom_id="25"
                     ),
                 ]
                 times1_row = manage_components.create_actionrow(*times1)
@@ -400,14 +416,29 @@ class ServerUtils(Cog):
                 times4_row = manage_components.create_actionrow(*times4)
                 times5_row = manage_components.create_actionrow(*times5)
                 await mute_btn_ctx.edit_origin(
-                    content="Select the duration of the mute!",
+                    content="Select the duration of the mute! (timeout: 180s)",
                     hidden=True,
                     components=[times1_row, times2_row, times3_row, times4_row, times5_row]
                 )
-                times_ctx: ComponentContext = await manage_components.wait_for_component(
-                    self.bot,
-                    components=[times1_row, times2_row, times3_row, times4_row, times5_row], check=lambda: ctx.author.id == times_ctx.author.id
-                )
+                try:
+                    times_ctx: ComponentContext = await manage_components.wait_for_component(
+                        self.bot,
+                        components=[times1_row, times2_row, times3_row, times4_row, times5_row],
+                        check=lambda: ctx.author.id == times_ctx.author.id,
+                        timeout=180
+                    )
+                except asyncio.TimeoutError:
+                    for i in range(5):
+                        times1_row["components"][i]["disabled"] = True
+                        times2_row["components"][i]["disabled"] = True
+                        times3_row["components"][i]["disabled"] = True
+                        times4_row["components"][i]["disabled"] = True
+                        times5_row["components"][i]["disabled"] = True
+                    await mute_btn_ctx.edit_origin(
+                        content="Timed out.", hidden=True, 
+                        components=[times1_row, times2_row, times3_row, times4_row, times5_row]
+                    )
+                    return
                 for i in range(5):
                     times1_row["components"][i]["disabled"] = True
                     times2_row["components"][i]["disabled"] = True
@@ -426,12 +457,10 @@ class ServerUtils(Cog):
             ...  # do your own warn stuff here
 
         if buttons.component_id == "kick":
-            # await user.kick(reason=
-            ...  # do your own kick stuff with embeds or what you want
-
-
+            ...
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")
+    # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="unban", description="unbans a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="add-role", description="adds a role to a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="remove-role", description="removes a role from a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role")
@@ -443,7 +472,6 @@ class ServerUtils(Cog):
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="create", description="creates a category")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="edit", description="edits a category") # not sure about that one
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="delete", description="deletes a category")
-
 
 
 def setup(bot: AutoShardedBot):
