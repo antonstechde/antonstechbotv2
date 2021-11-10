@@ -1,4 +1,6 @@
 import configparser
+import subprocess
+
 from utils import utils
 
 
@@ -7,6 +9,7 @@ class Config:
         self.__config_parser__ = configparser.ConfigParser(interpolation=None)
         self.__config_parser__.read(utils.get_project_dir() + "/config/config.ini")
 
+        self.Version=None
         self.TOKEN = None
         self.LOG_LEVEL = None
 
@@ -25,6 +28,8 @@ class Config:
         self.setup()
 
     def setup(self):
+        self.Version = subprocess.check_output(["git", "describe", "--tags", "--always"]).decode('ascii').strip()
+
         bot_config = self.__config_parser__["BOT"]
 
         self.TOKEN = bot_config["TOKEN"]
