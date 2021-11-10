@@ -24,7 +24,7 @@ class Commands(Cog):
     @cog_ext.cog_slash(name="invite", description="Lets you invite the Bot")
     async def _bot_invite(self, ctx: SlashContext):
         embed = discord.Embed()
-        embed.set_author(name="Press the Link to invite the bot",
+        embed.set_author(name="Click me :D",
                          url=discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(8),
                                                      guild=ctx.guild, scopes=["bot", "applications.commands"]))
         await ctx.send(embed=embed)

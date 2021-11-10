@@ -58,7 +58,7 @@ class RoleReactions(Cog):
         utils.DB_CONNECTOR.commit()
         cursor.close()
 
-        await ctx.send(embed=utils.return_embed(ctx, "Done", "Idk, done", discord.Color.green()))
+        await ctx.send(embed=utils.return_embed(ctx, "Done", f"Successfully set up a role reaction at [this message]({fetched_message.jump_url})!", discord.Color.green()))
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
