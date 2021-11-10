@@ -26,6 +26,7 @@ def main():
         final_server_names = ", ".join(server_names)
         config_string = f"""Information:
     - Logged in as {bot.user}
+    - Bot running on Version {utils.CONFIG.Version}
     - discord-py-interaction version: {__version__}
     - Is in the following {str(len(bot.guilds))} servers:
         {final_server_names}
