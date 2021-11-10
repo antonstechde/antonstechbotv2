@@ -528,7 +528,7 @@ class ServerUtils(Cog):
     @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role")
     async def _create_role(self, ctx: SlashContext, name: str, color: str):
         if not ctx.author.guild_permissions.manage_roles:
-            raise discord.ext.commands.MissingPermissions
+            raise discord.ext.commands.errors.MissingPermissions(missing_perms=["manage_roles"])
         match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)  # check if color is hex
         if not match:
             raise discord.ext.commands.BadArgument("color is not a hex-color code")
