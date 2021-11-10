@@ -7,12 +7,10 @@ from discord_slash.model import SlashCommandPermissionType
 
 def get_admin_permissions():
     adminperms = {
-        723220208772186156: [  # only on our Discord Server
-            create_permission(782026258921553933, SlashCommandPermissionType.ROLE, True),  # Mod role
-            create_permission(907261618088443914, SlashCommandPermissionType.ROLE, True)  # Developer role
-        ],
-        792862721556480031: [
-            create_permission(327906969971326976, SlashCommandPermissionType.USER, True)  # Me on my testing server
+        723220208772186156: [
+            create_permission(708275751816003615, SlashCommandPermissionType.USER, True),  # Ed_Vraz
+            create_permission(450415578654441486, SlashCommandPermissionType.USER, True),  # Ole
+            create_permission(327906969971326976, SlashCommandPermissionType.USER, True)   # anton
         ]
     }
     return adminperms

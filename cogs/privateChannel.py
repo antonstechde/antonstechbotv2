@@ -17,7 +17,7 @@ class PrivateChannel(Cog):
         self.bot = bot
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
-    @cog_ext.cog_slash(guild_ids=[761304285798989896], name="private-channel", description="Allows you to create Private Channels :)", options=[
+    @cog_ext.cog_slash(name="private-channel", description="Allows you to create Private Channels :)", options=[
         {
             "name": "create",
             "description": "Create a private channel",
