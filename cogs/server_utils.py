@@ -533,6 +533,7 @@ class ServerUtils(Cog):
         if not match:
             raise discord.ext.commands.BadArgument("color is not a hex-color code")
 
+
         ...
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
