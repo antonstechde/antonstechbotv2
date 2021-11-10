@@ -123,10 +123,12 @@ class PrivateChannel(Cog):
             if user_has_private_channel:
                 await ctx.send(embed=utils.return_embed(ctx, "Error", "You already have a private channel!", discord.Color.red()), hidden=True)
                 return
-
-            channel_created = await category.create_voice_channel(channel_name, overwrites={
+            guild = ctx.guild
+            channel_created = await category.create_voice_channel(channel_name, bitrate=guild.bitrate_limit,  overwrites={
                 ctx.guild.default_role: discord.PermissionOverwrite(connect=False),
-                ctx.author: discord.PermissionOverwrite(connect=True)
+                ctx.author: discord.PermissionOverwrite(connect=True, move_members=True, speak=True,
+                                                  mute_members=True, use_voice_activation=True,
+                                                  view_channel=True, stream=True)
             }, reason="Private-Channel got created")
 
             create_sql = "insert into private_channels (channel_owner_id, channel_id, whitelisted_users, guild_id) values (%s, %s, %s, %s)"
@@ -184,7 +186,8 @@ class PrivateChannel(Cog):
 
             user_whitelisted_users.append(member_to_allow.id)
 
-            await private_channel.set_permissions(member_to_allow, overwrite=discord.PermissionOverwrite(connect=True))
+            await private_channel.set_permissions(member_to_allow, overwrite=discord.PermissionOverwrite(connect=True, speak=True, use_voice_activation=True,
+                                          view_channel=True, stream=True))
 
             update_sql = "update private_channels set whitelisted_users = %s where guild_id = %s and channel_id = %s and channel_owner_id = %s"
             cursor.execute(update_sql, (str(user_whitelisted_users), ctx.guild.id, private_channel.id, ctx.author.id))
