@@ -82,6 +82,7 @@ class ServerUtils(Cog):
                                                                                        user_buttons_actionrow3],
                                                                  timeout=60,
                                                                  check=lambda msg: ctx.author.id == msg.author.id)
+            await buttons.defer(edit_origin=True)
         except asyncio.TimeoutError:
             for i in range(2):
                 user_buttons_actionrow1["components"][i]["disabled"] = True
@@ -115,6 +116,7 @@ class ServerUtils(Cog):
             mute_btn_ctx: ComponentContext = await manage_components.wait_for_component(
                 self.bot, components=mute_actionrow, check=lambda msg: msg.author.id == buttons.author.id
             )
+            await mute_btn_ctx.defer(edit_origin=True)
             if mute_btn_ctx.component_id == "c":
                 for i in range(4):
                     mute_actionrow["components"][i]["disabled"] = True
@@ -178,6 +180,7 @@ class ServerUtils(Cog):
                         self.bot, components=[times1_row, times2_row, times3_row],
                         check=lambda msg: msg.author.id == mute_btn_ctx.author.id, timeout=180,
                     )
+                    await times_ctx.defer(edit_origin=True)
                 except asyncio.TimeoutError:
                     for i in range(4):
                         times1_row["components"][i]["disabled"] = True
@@ -300,6 +303,7 @@ class ServerUtils(Cog):
                         check=lambda msg: mute_btn_ctx.author.id == msg.author.id,
                         timeout=180
                     )
+                    await times_ctx.defer(edit_origin=True)
                 except asyncio.TimeoutError:
                     for i in range(5):
                         times1_row["components"][i]["disabled"] = True
@@ -430,6 +434,7 @@ class ServerUtils(Cog):
                         check=lambda msg: mute_btn_ctx.author.id == msg.author.id,
                         timeout=180
                     )
+                    await times_ctx.defer(edit_origin=True)
                 except asyncio.TimeoutError:
                     for i in range(5):
                         times1_row["components"][i]["disabled"] = True
@@ -524,7 +529,7 @@ class ServerUtils(Cog):
             "required": True,
         },
     ]
-
+    """
     @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role")
     async def _create_role(self, ctx: SlashContext, name: str, color: str):
         if not ctx.author.guild_permissions.manage_roles:
@@ -533,8 +538,54 @@ class ServerUtils(Cog):
         if not match:
             raise discord.ext.commands.BadArgument("color is not a hex-color code")
 
+        await ctx.defer(hidden=False)
 
-        ...
+        roleperm = discord.Permissions.none()
+        anypermbutton = [
+            manage_components.create_button(
+                label="Yes", style=ButtonStyle.green, custom_id="yes"
+            ),
+            manage_components.create_button(
+                label="No", style=ButtonStyle.red, custom_id="no"
+            )
+        ]
+        adminbutton = [
+            manage_components.create_button(
+                label="Yes", style=ButtonStyle.green, custom_id="yes"
+            ),
+            manage_components.create_button(
+                label="No", style=ButtonStyle.red, custom_id="no"
+            ),
+        ]
+        any_ar = manage_components.create_actionrow(*anypermbutton)
+        adm_ar = manage_components.create_actionrow(*adminbutton)
+
+
+
+
+        ask = await ctx.send(
+            "Do you want the role to have administrator-permissions?",
+            components=[adm_ar]
+        )
+        try:
+            answer: ComponentContext = await wait_for_component(self.bot, components=[adm_ar],
+                                                                timeout=600,
+                                                                check=lambda msg: ctx.author.id == msg.author.id)
+            await answer.defer(edit_origin=True)
+        except asyncio.TimeoutError:
+            for i in range(2):
+                adm_ar["components"][i]["disabled"] = True
+            await ask.edit(
+                content="Timed out.", components=[adm_ar]
+            )
+            return
+
+        if answer.component_id == "yes":
+            ...
+
+        else:
+            ...
+"""
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="delete", description="deletes a role")
