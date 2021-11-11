@@ -612,7 +612,7 @@ class ServerUtils(Cog):
             roleperm.administrator = True
             for i in range(2):
                 adm_ar["components"][i]["disabled"] = True
-            await answer.edit_origin(
+            await admin.edit_origin(
                 content=f"creating role '{name}' with the color #{hexval} and administrator permissions....",
                 components=[adm_ar]
             )
