@@ -1,4 +1,5 @@
 import asyncio
+import regex as re
 
 import discord
 from discord.ext.commands import Cog, AutoShardedBot
@@ -7,6 +8,7 @@ from discord_slash.utils import manage_components
 from discord_slash.utils.manage_components import wait_for_component
 
 from utils import utils, punishments
+
 guildid = [723220208772186156]
 
 
@@ -80,6 +82,7 @@ class ServerUtils(Cog):
                                                                                        user_buttons_actionrow3],
                                                                  timeout=60,
                                                                  check=lambda msg: ctx.author.id == msg.author.id)
+            await buttons.defer(edit_origin=True)
         except asyncio.TimeoutError:
             for i in range(2):
                 user_buttons_actionrow1["components"][i]["disabled"] = True
@@ -113,6 +116,7 @@ class ServerUtils(Cog):
             mute_btn_ctx: ComponentContext = await manage_components.wait_for_component(
                 self.bot, components=mute_actionrow, check=lambda msg: msg.author.id == buttons.author.id
             )
+            await mute_btn_ctx.defer(edit_origin=True)
             if mute_btn_ctx.component_id == "c":
                 for i in range(4):
                     mute_actionrow["components"][i]["disabled"] = True
@@ -176,6 +180,7 @@ class ServerUtils(Cog):
                         self.bot, components=[times1_row, times2_row, times3_row],
                         check=lambda msg: msg.author.id == mute_btn_ctx.author.id, timeout=180,
                     )
+                    await times_ctx.defer(edit_origin=True)
                 except asyncio.TimeoutError:
                     for i in range(4):
                         times1_row["components"][i]["disabled"] = True
@@ -298,6 +303,7 @@ class ServerUtils(Cog):
                         check=lambda msg: mute_btn_ctx.author.id == msg.author.id,
                         timeout=180
                     )
+                    await times_ctx.defer(edit_origin=True)
                 except asyncio.TimeoutError:
                     for i in range(5):
                         times1_row["components"][i]["disabled"] = True
@@ -307,7 +313,7 @@ class ServerUtils(Cog):
                     for i in range(4):
                         times5_row["components"][i]["disabled"] = True
                     await mute_btn_ctx.origin_message.edit(
-                        content="Timed out.", hidden=True, 
+                        content="Timed out.", hidden=True,
                         components=[times1_row, times2_row, times3_row, times4_row, times5_row]
                     )
                     return
@@ -428,6 +434,7 @@ class ServerUtils(Cog):
                         check=lambda msg: mute_btn_ctx.author.id == msg.author.id,
                         timeout=180
                     )
+                    await times_ctx.defer(edit_origin=True)
                 except asyncio.TimeoutError:
                     for i in range(5):
                         times1_row["components"][i]["disabled"] = True
@@ -436,7 +443,7 @@ class ServerUtils(Cog):
                         times4_row["components"][i]["disabled"] = True
                         times5_row["components"][i]["disabled"] = True
                     await mute_btn_ctx.origin_message.edit(
-                        content="Timed out.", hidden=True, 
+                        content="Timed out.", hidden=True,
                         components=[times1_row, times2_row, times3_row, times4_row, times5_row]
                     )
                     return
@@ -458,7 +465,8 @@ class ServerUtils(Cog):
             await buttons.edit_origin(content="please send a message with the reason of the warning! (timeout: 600s)",
                                       components=[])
             try:
-                a = await self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
+                a = await self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id,
+                                            timeout=600)
             except asyncio.TimeoutError:
                 await buttons.origin_message.edit("Timed out, process canceled.")
                 return
@@ -471,7 +479,8 @@ class ServerUtils(Cog):
             await buttons.edit_origin(content="please send a message with the reason of the kick! (timeout: 600s)",
                                       components=[])
             try:
-                a = await self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
+                a = await self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id,
+                                            timeout=600)
             except asyncio.TimeoutError:
                 await buttons.origin_message.edit("Timed out, process canceled.")
                 return
@@ -484,7 +493,8 @@ class ServerUtils(Cog):
             await buttons.edit_origin(content="please send a message with the reason of the ban! (timeout: 600s)",
                                       components=[])
             try:
-                a = await self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id, timeout=600)
+                a = await self.bot.wait_for("message", check=lambda msg: msg.author.id == buttons.author.id,
+                                            timeout=600)
             except asyncio.TimeoutError:
                 await buttons.origin_message.edit("Timed out, process canceled.")
                 return
@@ -494,7 +504,8 @@ class ServerUtils(Cog):
             await punishments.ban(ctx, user, reason)
 
     @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="unban", description="unbans a user")
-    async def _unban(self, ctx: SlashContext, user_id: str, reason: str):  # in theory discord-slash should automatically create options for that
+    async def _unban(self, ctx: SlashContext, user_id: str,
+                     reason: str):  # in theory discord-slash should automatically create options for that
         user_id = int(user_id)
         user: discord.User = await self.bot.fetch_user(user_id)
         await ctx.guild.unban(user=user, reason=reason)
@@ -503,12 +514,86 @@ class ServerUtils(Cog):
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="add-role", description="adds a role to a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="remove-role", description="removes a role from a user")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role")
+
+    cre_opt = [
+        {
+            "name": "name",
+            "description": "the name of the role",
+            "required": True,
+            "type": 3,
+        },
+        {
+            "name": "color",
+            "description": "the colour of the role (hex code)",
+            "type": 3,
+            "required": True,
+        },
+    ]
+    """
+    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role")
+    async def _create_role(self, ctx: SlashContext, name: str, color: str):
+        if not ctx.author.guild_permissions.manage_roles:
+            raise discord.ext.commands.errors.MissingPermissions(missing_perms=["manage_roles"])
+        match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)  # check if color is hex
+        if not match:
+            raise discord.ext.commands.BadArgument("color is not a hex-color code")
+
+        await ctx.defer(hidden=False)
+
+        roleperm = discord.Permissions.none()
+        anypermbutton = [
+            manage_components.create_button(
+                label="Yes", style=ButtonStyle.green, custom_id="yes"
+            ),
+            manage_components.create_button(
+                label="No", style=ButtonStyle.red, custom_id="no"
+            )
+        ]
+        adminbutton = [
+            manage_components.create_button(
+                label="Yes", style=ButtonStyle.green, custom_id="yes"
+            ),
+            manage_components.create_button(
+                label="No", style=ButtonStyle.red, custom_id="no"
+            ),
+        ]
+        any_ar = manage_components.create_actionrow(*anypermbutton)
+        adm_ar = manage_components.create_actionrow(*adminbutton)
+
+
+
+
+        ask = await ctx.send(
+            "Do you want the role to have administrator-permissions?",
+            components=[adm_ar]
+        )
+        try:
+            answer: ComponentContext = await wait_for_component(self.bot, components=[adm_ar],
+                                                                timeout=600,
+                                                                check=lambda msg: ctx.author.id == msg.author.id)
+            await answer.defer(edit_origin=True)
+        except asyncio.TimeoutError:
+            for i in range(2):
+                adm_ar["components"][i]["disabled"] = True
+            await ask.edit(
+                content="Timed out.", components=[adm_ar]
+            )
+            return
+
+        if answer.component_id == "yes":
+            ...
+
+        else:
+            ...
+"""
+
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="delete", description="deletes a role")
+
     # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="create", description="creates a channel")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="edit", description="edits a channel") # not sure about that one
     # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="delete", description="deletes a channel")
+
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="create", description="creates a category")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="edit", description="edits a category") # not sure about that one
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="delete", description="deletes a category")

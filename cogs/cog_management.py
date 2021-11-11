@@ -48,6 +48,7 @@ class cog_management(Cog):
             buttons: ComponentContext = await wait_for_component(self.bot, components=[options_actionrow],
                                                                  timeout=60,
                                                                  check=lambda msg: ctx.author.id == msg.author.id)
+            await buttons.defer(edit_origin=True)
         except asyncio.TimeoutError:
             for i in range(3):
                 options_actionrow["components"][i]["disabled"] = True
@@ -73,6 +74,7 @@ class cog_management(Cog):
             unload_button_ctx: ComponentContext = await manage_components.wait_for_component(
                 self.bot, components=rl_actionrow, check=lambda msg: ctx.author.id == msg.author.id
             )
+            await unload_button_ctx.defer(edit_origin=True)
             if unload_button_ctx.component_id == "rl all":
                 await unload_button_ctx.edit_origin(content="reloading...")
                 for filename in os.listdir("./cogs"):
@@ -122,6 +124,7 @@ class cog_management(Cog):
             unload_button_ctx: ComponentContext = await manage_components.wait_for_component(
                 self.bot, components=rl_actionrow, check=lambda msg: ctx.author.id == msg.author.id
             )
+            await unload_button_ctx.defer(edit_origin=True)
             if unload_button_ctx.component_id == "l all":
                 await unload_button_ctx.edit_origin(content="loading...")
                 for filename in os.listdir("./cogs"):
@@ -171,6 +174,7 @@ class cog_management(Cog):
             unload_button_ctx: ComponentContext = await manage_components.wait_for_component(
                 self.bot, components=rl_actionrow, check=lambda msg: ctx.author.id == msg.author.id
             )
+            await unload_button_ctx.defer(edit_origin=True)
             if unload_button_ctx.component_id == "u all":
                 await unload_button_ctx.edit_origin(content="unloading...")
                 for filename in os.listdir("./cogs"):
