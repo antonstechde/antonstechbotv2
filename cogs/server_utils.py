@@ -599,7 +599,7 @@ class ServerUtils(Cog):
         )
         try:
             admin = await wait_for_component(self.bot, components=[adm_ar], timeout=600)
-            await answer.defer(edit_origin=True)
+            await admin.defer(edit_origin=True)
         except asyncio.TimeoutError:
             for i in range(2):
                 adm_ar["components"][i]["disabled"] = True
