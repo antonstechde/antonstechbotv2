@@ -528,7 +528,7 @@ class ServerUtils(Cog):
         },
     ]
 
-    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role", guild_ids=guildid)
+    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role")
     async def _create_role(self, ctx: SlashContext, name: str, color: str):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.errors.MissingPermissions(missing_perms=["manage_roles"])
