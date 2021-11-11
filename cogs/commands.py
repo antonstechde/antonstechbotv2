@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord import Embed
 from discord.ext.commands import Bot, Cog
@@ -39,6 +41,7 @@ class Commands(Cog):
     @cog_ext.cog_slash(name="shutdown", description="Shuts down the bot",
                        default_permission=False, permissions=get_admin_permissions())
     async def _shutdown(self, ctx: SlashContext):
+        os.system("git pull")
         await ctx.send("Shutting down...")
         await self.bot.logout()
 
