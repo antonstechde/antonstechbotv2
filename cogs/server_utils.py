@@ -587,6 +587,7 @@ class ServerUtils(Cog):
             )
             await ctx.guild.create_role(name=name, color=color, permissions=roleperm)
             await ctx.channel.send("Done")
+            return
 
         else:
             pass
@@ -616,86 +617,122 @@ class ServerUtils(Cog):
             )
             await ctx.guild.create_role(name=name, color=color, permissions=roleperm)
             await ctx.channel.send("Done")
+            return
 
         else:
-            sel = manage_components.create_select(
-                placeholder="Choose the permissions you want for your role",
-                min_values=1, max_values=18,
-                options=[
-                    create_select_option(
-                        label="add reactions to messages",
-                        value="add_reactions",
-                    ),
-                    create_select_option(
-                        label="attach files to messages",
-                        value="attach_files",
-                    ),
-                    create_select_option(
-                        label="ban members",
-                        value="ban_members",
-                    ),
-                    create_select_option(
-                        label="change own nickname",
-                        value="change_nickname",
-                    ),
-                    create_select_option(
-                        label="connect to voice channels",
-                        value="connect",
-                    ),
-                    create_select_option(
-                        label="create instant invite to a channel",
-                        value="create_instant_invite",
-                    ),
-                    create_select_option(
-                        label="deafen other members in voice channels",
-                        value="deafen_members",
-                    ),
-                    create_select_option(
-                        label="embed links in channels",
-                        value="embed_links",
-                    ),
-                    create_select_option(
-                        label="send external emojis",
-                        value="external_emojis",
-                    ),
-                    create_select_option(
-                        label="kick members",
-                        value="kick_members",
-                    ),
-                    create_select_option(
-                        label="manage channels on the server",
-                        value="manage_channels",
-                    ),
-                    create_select_option(
-                        label="manage emojis of the server",
-                        value="manage_emojis",
-                    ),
-                    create_select_option(
-                        label="manage guild",
-                        value="manage_guild",
-                    ),
-                    create_select_option(
-                        label="manage messages",
-                        value="manage_messages",
-                    ),
-                    create_select_option(
-                        label="manage all nicknames",
-                        value="manage_nicknames",
-                    ),
-                    create_select_option(
-                        label="manage the permission of roles",
-                        value="manage_permissions",
-                    ),
-                    create_select_option(
-                        label="manage roles and their permissions",
-                        value="manage_roles",
-                    ),
-                    create_select_option(
-                        label="manage webhooks",
-                        value="manage_webhools"
-                    ),
-                ],
-            )
+            pass
+
+        sel = manage_components.create_select(
+            placeholder="Choose the permissions you want for your role",
+            min_values=1, max_values=18,
+            options=[
+                create_select_option(
+                    label="add reactions to messages",
+                    value="add_reactions",
+                ),
+                create_select_option(
+                    label="attach files to messages",
+                    value="attach_files",
+                ),
+                create_select_option(
+                    label="ban members",
+                    value="ban_members",
+                ),
+                create_select_option(
+                    label="change own nickname",
+                    value="change_nickname",
+                ),
+                create_select_option(
+                    label="connect to voice channels",
+                    value="connect",
+                ),
+                create_select_option(
+                    label="create instant invite to a channel",
+                    value="create_instant_invite",
+                ),
+                create_select_option(
+                    label="deafen other members in voice channels",
+                    value="deafen_members",
+                ),
+                create_select_option(
+                    label="embed links in channels",
+                    value="embed_links",
+                ),
+                create_select_option(
+                    label="send external emojis",
+                    value="external_emojis",
+                ),
+                create_select_option(
+                    label="kick members",
+                    value="kick_members",
+                ),
+                create_select_option(
+                    label="manage channels on the server",
+                    value="manage_channels",
+                ),
+                create_select_option(
+                    label="manage emojis of the server",
+                    value="manage_emojis",
+                ),
+                create_select_option(
+                    label="manage guild",
+                    value="manage_guild",
+                ),
+                create_select_option(
+                    label="manage messages",
+                    value="manage_messages",
+                ),
+                create_select_option(
+                    label="manage all nicknames",
+                    value="manage_nicknames",
+                ),
+                create_select_option(
+                    label="manage the permission of roles",
+                    value="manage_permissions",
+                ),
+                create_select_option(
+                    label="manage roles and their permissions",
+                    value="manage_roles",
+                ),
+                create_select_option(
+                    label="manage webhooks",
+                    value="manage_webhooks"
+                ),
+            ],
+        )
+        selrow = manage_components.create_actionrow(sel)
+        await admin.edit_origin(
+            content="Please choose the permissions you want to assign to the role (1/2)",
+            components=[selrow]
+        )
+
+        try:
+            firstperms = await wait_for_component(self.bot, components=[selrow], timeout=600)
+            await firstperms.defer(edit_origin=True)
+        except asyncio.TimeoutError:
+            selrow["components"][0]["disabled"] = True
+            await admin.origin_message.edit("Timed out.", components=[selrow])
+            return
+
+        roleperm.add_reactions = True if "add_reactions" in firstperms.selected_options else False
+        roleperm.attach_files = True if "attach_files" in firstperms.selected_options else False
+        roleperm.ban_members = True if "ban_members" in firstperms.selected_options else False
+        roleperm.change_nickname = True if "change_nickname" in firstperms.selected_options else False
+        roleperm.connect = True if "connect" in firstperms.selected_options else False
+        roleperm.create_instant_invite = True if "create_instant_invite" in firstperms.selected_options else False
+        roleperm.deafen_members = True if "deafen_members" in firstperms.selected_options else False
+        roleperm.embed_links = True if "embed_links" in firstperms.selected_options else False
+        roleperm.external_emojis = True if "external_emojis" in firstperms.selected_options else False
+        roleperm.kick_members = True if "kick_members" in firstperms.selected_options else False
+        roleperm.manage_channels = True if "manage_channels" in firstperms.selected_options else False
+        roleperm.manage_emojis = True if "manage_emojis" in firstperms.selected_options else False
+        roleperm.manage_guild = True if "add_reactions" in firstperms.selected_options else False
+        roleperm.manage_messages = True if "manage_nicknames" in firstperms.selected_options else False
+        roleperm.manage_nicknames = True if "add_reactions" in firstperms.selected_options else False
+        roleperm.manage_permissions = True if "manage_permissions" in firstperms.selected_options else False
+        roleperm.manage_roles = True if "manage_roles" in firstperms.selected_options else False
+        roleperm.manage_webhooks = True if "manage_webhooks" in firstperms.selected_options else False
+
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="delete", description="deletes a role")
