@@ -4,3 +4,4 @@ requests==2.26.0
 colorama==0.4.4
 psycopg2-binary==2.9.1
 discord~=1.7.3
+regex
