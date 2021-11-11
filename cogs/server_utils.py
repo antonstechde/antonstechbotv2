@@ -4,10 +4,8 @@ import re
 from discord.ext.commands import Cog, AutoShardedBot
 from discord_slash import cog_ext, SlashContext, ButtonStyle, ComponentContext
 from discord_slash.utils import manage_components
-from discord_slash.utils.manage_components import wait_for_component
+from discord_slash.utils.manage_components import wait_for_component, create_select_option
 from utils import utils, punishments
-
-guildid = [908371267751661639]
 
 
 class ServerUtils(Cog):
@@ -620,8 +618,84 @@ class ServerUtils(Cog):
             await ctx.channel.send("Done")
 
         else:
-            ...
-
+            sel = manage_components.create_select(
+                placeholder="Choose the permissions you want for your role",
+                min_values=1, max_values=18,
+                options=[
+                    create_select_option(
+                        label="add reactions to messages",
+                        value="add_reactions",
+                    ),
+                    create_select_option(
+                        label="attach files to messages",
+                        value="attach_files",
+                    ),
+                    create_select_option(
+                        label="ban members",
+                        value="ban_members",
+                    ),
+                    create_select_option(
+                        label="change own nickname",
+                        value="change_nickname",
+                    ),
+                    create_select_option(
+                        label="connect to voice channels",
+                        value="connect",
+                    ),
+                    create_select_option(
+                        label="create instant invite to a channel",
+                        value="create_instant_invite",
+                    ),
+                    create_select_option(
+                        label="deafen other members in voice channels",
+                        value="deafen_members",
+                    ),
+                    create_select_option(
+                        label="embed links in channels",
+                        value="embed_links",
+                    ),
+                    create_select_option(
+                        label="send external emojis",
+                        value="external_emojis",
+                    ),
+                    create_select_option(
+                        label="kick members",
+                        value="kick_members",
+                    ),
+                    create_select_option(
+                        label="manage channels on the server",
+                        value="manage_channels",
+                    ),
+                    create_select_option(
+                        label="manage emojis of the server",
+                        value="manage_emojis",
+                    ),
+                    create_select_option(
+                        label="manage guild",
+                        value="manage_guild",
+                    ),
+                    create_select_option(
+                        label="manage messages",
+                        value="manage_messages",
+                    ),
+                    create_select_option(
+                        label="manage all nicknames",
+                        value="manage_nicknames",
+                    ),
+                    create_select_option(
+                        label="manage the permission of roles",
+                        value="manage_permissions",
+                    ),
+                    create_select_option(
+                        label="manage roles and their permissions",
+                        value="manage_roles",
+                    ),
+                    create_select_option(
+                        label="manage webhooks",
+                        value="manage_webhools"
+                    ),
+                ],
+            )
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="delete", description="deletes a role")
