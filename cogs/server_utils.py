@@ -1,15 +1,13 @@
 import asyncio
-import regex as re
-
 import discord
+import re
 from discord.ext.commands import Cog, AutoShardedBot
 from discord_slash import cog_ext, SlashContext, ButtonStyle, ComponentContext
 from discord_slash.utils import manage_components
 from discord_slash.utils.manage_components import wait_for_component
-
 from utils import utils, punishments
 
-guildid = [723220208772186156]
+guildid = [908371267751661639]
 
 
 class ServerUtils(Cog):
@@ -529,18 +527,21 @@ class ServerUtils(Cog):
             "required": True,
         },
     ]
-    """
-    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role")
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role", guild_ids=guildid)
     async def _create_role(self, ctx: SlashContext, name: str, color: str):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.errors.MissingPermissions(missing_perms=["manage_roles"])
         match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)  # check if color is hex
         if not match:
             raise discord.ext.commands.BadArgument("color is not a hex-color code")
-
+        hexval = color.lstrip("#")
+        rgbval = tuple(bytes.fromhex(hexval))
         await ctx.defer(hidden=False)
 
-        roleperm = discord.Permissions.none()
+        roleperm = discord.Permissions().none()
+        color = discord.Colour.from_rgb(r=rgbval[0], g=rgbval[1], b=rgbval[2])
+
         anypermbutton = [
             manage_components.create_button(
                 label="Yes", style=ButtonStyle.green, custom_id="yes"
@@ -549,6 +550,7 @@ class ServerUtils(Cog):
                 label="No", style=ButtonStyle.red, custom_id="no"
             )
         ]
+
         adminbutton = [
             manage_components.create_button(
                 label="Yes", style=ButtonStyle.green, custom_id="yes"
@@ -560,17 +562,43 @@ class ServerUtils(Cog):
         any_ar = manage_components.create_actionrow(*anypermbutton)
         adm_ar = manage_components.create_actionrow(*adminbutton)
 
-
-
-
         ask = await ctx.send(
-            "Do you want the role to have administrator-permissions?",
+            "Do you want to have any Permission enabled on your role?",
+            components=[any_ar]
+        )
+
+        try:
+            answer: ComponentContext = await wait_for_component(self.bot, components=[any_ar],
+                                                                timeout=600,
+                                                                check=lambda msg: ctx.author.id == msg.author.id)
+            await answer.defer(edit_origin=True)
+        except asyncio.TimeoutError:
+            for i in range(2):
+                any_ar["components"][i]["disabled"] = True
+            await ask.edit(
+                content="Timed out.", components=[any_ar]
+            )
+            return
+
+        if answer.component_id == "no":
+            for i in range(2):
+                any_ar["components"][i]["disabled"] = True
+            await answer.edit_origin(
+                content=f"creating role '{name}' with the color #{hexval} and no permissions....",
+                components=[any_ar]
+            )
+            await ctx.guild.create_role(name=name, color=color, permissions=roleperm)
+            await ctx.channel.send("Done")
+
+        else:
+            pass
+
+        await answer.edit_origin(
+            content="Do you want the role to have administrator-permissions?",
             components=[adm_ar]
         )
         try:
-            answer: ComponentContext = await wait_for_component(self.bot, components=[adm_ar],
-                                                                timeout=600,
-                                                                check=lambda msg: ctx.author.id == msg.author.id)
+            admin = await wait_for_component(self.bot, components=[adm_ar], timeout=600)
             await answer.defer(edit_origin=True)
         except asyncio.TimeoutError:
             for i in range(2):
@@ -580,12 +608,20 @@ class ServerUtils(Cog):
             )
             return
 
-        if answer.component_id == "yes":
-            ...
+        if admin.component_id == "yes":
+            roleperm.administrator = True
+            for i in range(2):
+                adm_ar["components"][i]["disabled"] = True
+            await answer.edit_origin(
+                content=f"creating role '{name}' with the color #{hexval} and administrator permissions....",
+                components=[adm_ar]
+            )
+            await ctx.guild.create_role(name=name, color=color, permissions=roleperm)
+            await ctx.channel.send("Done")
 
         else:
             ...
-"""
+
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="delete", description="deletes a role")
