@@ -17,6 +17,228 @@ class ServerUtils(Cog):
         self.bot: AutoShardedBot = bot
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
+    async def _get_role_permissions(self, ctx: ComponentContext, roleperm):
+        sel = manage_components.create_select(
+            placeholder="Choose the permissions you want for your role (1/2)",
+            min_values=1, max_values=18,
+            options=[
+                create_select_option(
+                    label="add reactions to messages",
+                    value="add_reactions",
+                ),
+                create_select_option(
+                    label="attach files to messages",
+                    value="attach_files",
+                ),
+                create_select_option(
+                    label="ban members",
+                    value="ban_members",
+                ),
+                create_select_option(
+                    label="change own nickname",
+                    value="change_nickname",
+                ),
+                create_select_option(
+                    label="connect to voice channels",
+                    value="connect",
+                ),
+                create_select_option(
+                    label="create instant invite to a channel",
+                    value="create_instant_invite",
+                ),
+                create_select_option(
+                    label="deafen other members in voice channels",
+                    value="deafen_members",
+                ),
+                create_select_option(
+                    label="embed links in channels",
+                    value="embed_links",
+                ),
+                create_select_option(
+                    label="send external emojis",
+                    value="external_emojis",
+                ),
+                create_select_option(
+                    label="kick members",
+                    value="kick_members",
+                ),
+                create_select_option(
+                    label="manage channels on the server",
+                    value="manage_channels",
+                ),
+                create_select_option(
+                    label="manage emojis of the server",
+                    value="manage_emojis",
+                ),
+                create_select_option(
+                    label="manage guild",
+                    value="manage_guild",
+                ),
+                create_select_option(
+                    label="manage messages",
+                    value="manage_messages",
+                ),
+                create_select_option(
+                    label="manage all nicknames",
+                    value="manage_nicknames",
+                ),
+                create_select_option(
+                    label="manage the permission of roles",
+                    value="manage_permissions",
+                ),
+                create_select_option(
+                    label="manage roles and their permissions",
+                    value="manage_roles",
+                ),
+                create_select_option(
+                    label="manage webhooks",
+                    value="manage_webhooks"
+                ),
+            ],
+        )
+        selrow = manage_components.create_actionrow(sel)
+        await ctx.edit_origin(
+            content="Please choose the permissions you want to assign to the role (1/2)",
+            components=[selrow]
+        )
+
+        try:
+            firstperms = await wait_for_component(self.bot, components=[selrow], timeout=600,
+                                                  check=lambda msg: msg.author.id == ctx.author.id)
+            await firstperms.defer(edit_origin=True)
+        except asyncio.TimeoutError:
+            selrow["components"][0]["disabled"] = True
+            await ctx.origin_message.edit("Timed out.", components=[selrow])
+            return
+
+        roleperm.add_reactions = True if "add_reactions" in firstperms.selected_options else False
+        roleperm.attach_files = True if "attach_files" in firstperms.selected_options else False
+        roleperm.ban_members = True if "ban_members" in firstperms.selected_options else False
+        roleperm.change_nickname = True if "change_nickname" in firstperms.selected_options else False
+        roleperm.connect = True if "connect" in firstperms.selected_options else False
+        roleperm.create_instant_invite = True if "create_instant_invite" in firstperms.selected_options else False
+        roleperm.deafen_members = True if "deafen_members" in firstperms.selected_options else False
+        roleperm.embed_links = True if "embed_links" in firstperms.selected_options else False
+        roleperm.external_emojis = True if "external_emojis" in firstperms.selected_options else False
+        roleperm.kick_members = True if "kick_members" in firstperms.selected_options else False
+        roleperm.manage_channels = True if "manage_channels" in firstperms.selected_options else False
+        roleperm.manage_emojis = True if "manage_emojis" in firstperms.selected_options else False
+        roleperm.manage_guild = True if "manage_guild" in firstperms.selected_options else False
+        roleperm.manage_messages = True if "manage_messages" in firstperms.selected_options else False
+        roleperm.manage_nicknames = True if "manage_nicknames" in firstperms.selected_options else False
+        roleperm.manage_permissions = True if "manage_permissions" in firstperms.selected_options else False
+        roleperm.manage_roles = True if "manage_roles" in firstperms.selected_options else False
+        roleperm.manage_webhooks = True if "manage_webhooks" in firstperms.selected_options else False
+
+        sel2 = manage_components.create_select(
+            placeholder="Choose the permissions you want for your role (2/2)",
+            max_values=17, min_values=1,
+            options=[
+                create_select_option(
+                    label="mention everyone in a message",
+                    value="mention_everyone",
+                ),
+                create_select_option(
+                    label="move members across voice channels",
+                    value="move_members",
+                ),
+                create_select_option(
+                    label="mute members in voice channels",
+                    value="mute_members",
+                ),
+                create_select_option(
+                    label="priority speaker",
+                    value="priority_speaker",
+                ),
+                create_select_option(
+                    label="read message history in channels",
+                    value="read_message_history",
+                ),
+                create_select_option(
+                    label="read all messages in channels",
+                    value="read_messages",
+                ),
+                create_select_option(
+                    label="request to speak in stage channels",
+                    value="request_to_speak",
+                ),
+                create_select_option(
+                    label="send messages in channels",
+                    value="send_messages",
+                ),
+                create_select_option(
+                    label="send TTS messages in channels",
+                    value="send_tts_messages",
+                ),
+                create_select_option(
+                    label="speak in voice channels",
+                    value="speak",
+                ),
+                create_select_option(
+                    label="stream in voice channels",
+                    value="stream",
+                ),
+                create_select_option(
+                    label="use external emojis",
+                    value="use_external_emojis",
+                ),
+                create_select_option(
+                    label="use slash commands in channels",
+                    value="use_slash_commands",
+                ),
+                create_select_option(
+                    label="use voice activation in voice channels (else only push-to-talk)",
+                    value="use_voice_activation",
+                ),
+                create_select_option(
+                    label="view the audit-log",
+                    value="view_audit_log",
+                ),
+                create_select_option(
+                    label="view channels",
+                    value="view_channel",
+                ),
+                create_select_option(
+                    label="view guild insights",
+                    value="view_guild_insights",
+                ),
+            ],
+        )
+        sel2row = manage_components.create_actionrow(sel2)
+        await firstperms.edit_origin(
+            content="Please choose the permissions you want to assign to the role (2/2)",
+            components=[sel2row],
+        )
+
+        try:
+            secondperms = await wait_for_component(self.bot, components=[sel2row], timeout=600,
+                                                   check=lambda msg: msg.author.id == ctx.author.id)
+            await secondperms.defer(edit_origin=True)
+        except asyncio.TimeoutError:
+            sel2row["components"][0]["disabled"] = True
+            await firstperms.origin_message.edit("Timed out.", components=[sel2row])
+            return
+
+        roleperm.mention_everyone = True if "mention_everyone" in secondperms.selected_options else False
+        roleperm.move_members = True if "move_members" in secondperms.selected_options else False
+        roleperm.mute_members = True if "mute_members" in secondperms.selected_options else False
+        roleperm.priority_speaker = True if "priority_speaker" in secondperms.selected_options else False
+        roleperm.read_message_history = True if "read_message_history" in secondperms.selected_options else False
+        roleperm.read_messages = True if "read_messages" in secondperms.selected_options else False
+        roleperm.request_to_speak = True if "request_to_speak" in secondperms.selected_options else False
+        roleperm.send_messages = True if "send_messages" in secondperms.selected_options else False
+        roleperm.send_tts_messages = True if "send_tts_messages" in secondperms.selected_options else False
+        roleperm.speak = True if "speak" in secondperms.selected_options else False
+        roleperm.stream = True if "stream" in secondperms.selected_options else False
+        roleperm.use_external_emojis = True if "use_external_emojis" in secondperms.selected_options else False
+        roleperm.use_slash_commands = True if "use_slash_commands" in secondperms.selected_options else False
+        roleperm.use_voice_activation = True if "use_voice_activation" in secondperms.selected_options else False
+        roleperm.view_audit_log = True if "view_audit_log" in secondperms.selected_options else False
+        roleperm.view_channel = True if "view_channel" in secondperms.selected_options else False
+        roleperm.view_guild_insights = True if "view_guild_insights" in secondperms.selected_options else False
+
+        return roleperm, sel2row, secondperms
+
     pun_opt = [
         {
             "name": "user",
@@ -540,7 +762,8 @@ class ServerUtils(Cog):
 
     @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role",
                             options=rcre_opt)
-    async def _create_role(self, ctx: SlashContext, name: str, color: str, hoist: bool = False, mentionable: bool = False):
+    async def _create_role(self, ctx: SlashContext, name: str, color: str, hoist: bool = False,
+                           mentionable: bool = False):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.errors.MissingPermissions(missing_perms=["manage_roles"])
         match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)  # check if color is hex
@@ -598,7 +821,8 @@ class ServerUtils(Cog):
                 content=f"creating role '{name}' with the color #{hexval} and no permissions....",
                 components=[any_ar]
             )
-            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable)
+            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist,
+                                        mentionable=mentionable)
             await ctx.channel.send("Done")
             return
 
@@ -610,7 +834,8 @@ class ServerUtils(Cog):
             components=[adm_ar]
         )
         try:
-            admin = await wait_for_component(self.bot, components=[adm_ar], timeout=600)
+            admin: ComponentContext = await wait_for_component(self.bot, components=[adm_ar], timeout=600,
+                                                               check=lambda msg: msg.author.id == ctx.author.id)
             await admin.defer(edit_origin=True)
         except asyncio.TimeoutError:
             for i in range(2):
@@ -628,229 +853,16 @@ class ServerUtils(Cog):
                 content=f"creating role '{name}' with the color #{hexval} and administrator permissions....",
                 components=[adm_ar]
             )
-            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable)
+            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist,
+                                        mentionable=mentionable)
             await ctx.channel.send("Done")
             return
 
         else:
-            pass
-
-        sel = manage_components.create_select(
-            placeholder="Choose the permissions you want for your role (1/2)",
-            min_values=1, max_values=18,
-            options=[
-                create_select_option(
-                    label="add reactions to messages",
-                    value="add_reactions",
-                ),
-                create_select_option(
-                    label="attach files to messages",
-                    value="attach_files",
-                ),
-                create_select_option(
-                    label="ban members",
-                    value="ban_members",
-                ),
-                create_select_option(
-                    label="change own nickname",
-                    value="change_nickname",
-                ),
-                create_select_option(
-                    label="connect to voice channels",
-                    value="connect",
-                ),
-                create_select_option(
-                    label="create instant invite to a channel",
-                    value="create_instant_invite",
-                ),
-                create_select_option(
-                    label="deafen other members in voice channels",
-                    value="deafen_members",
-                ),
-                create_select_option(
-                    label="embed links in channels",
-                    value="embed_links",
-                ),
-                create_select_option(
-                    label="send external emojis",
-                    value="external_emojis",
-                ),
-                create_select_option(
-                    label="kick members",
-                    value="kick_members",
-                ),
-                create_select_option(
-                    label="manage channels on the server",
-                    value="manage_channels",
-                ),
-                create_select_option(
-                    label="manage emojis of the server",
-                    value="manage_emojis",
-                ),
-                create_select_option(
-                    label="manage guild",
-                    value="manage_guild",
-                ),
-                create_select_option(
-                    label="manage messages",
-                    value="manage_messages",
-                ),
-                create_select_option(
-                    label="manage all nicknames",
-                    value="manage_nicknames",
-                ),
-                create_select_option(
-                    label="manage the permission of roles",
-                    value="manage_permissions",
-                ),
-                create_select_option(
-                    label="manage roles and their permissions",
-                    value="manage_roles",
-                ),
-                create_select_option(
-                    label="manage webhooks",
-                    value="manage_webhooks"
-                ),
-            ],
-        )
-        selrow = manage_components.create_actionrow(sel)
-        await admin.edit_origin(
-            content="Please choose the permissions you want to assign to the role (1/2)",
-            components=[selrow]
-        )
-
-        try:
-            firstperms = await wait_for_component(self.bot, components=[selrow], timeout=600)
-            await firstperms.defer(edit_origin=True)
-        except asyncio.TimeoutError:
-            selrow["components"][0]["disabled"] = True
-            await admin.origin_message.edit("Timed out.", components=[selrow])
-            return
-
-        roleperm.add_reactions = True if "add_reactions" in firstperms.selected_options else False
-        roleperm.attach_files = True if "attach_files" in firstperms.selected_options else False
-        roleperm.ban_members = True if "ban_members" in firstperms.selected_options else False
-        roleperm.change_nickname = True if "change_nickname" in firstperms.selected_options else False
-        roleperm.connect = True if "connect" in firstperms.selected_options else False
-        roleperm.create_instant_invite = True if "create_instant_invite" in firstperms.selected_options else False
-        roleperm.deafen_members = True if "deafen_members" in firstperms.selected_options else False
-        roleperm.embed_links = True if "embed_links" in firstperms.selected_options else False
-        roleperm.external_emojis = True if "external_emojis" in firstperms.selected_options else False
-        roleperm.kick_members = True if "kick_members" in firstperms.selected_options else False
-        roleperm.manage_channels = True if "manage_channels" in firstperms.selected_options else False
-        roleperm.manage_emojis = True if "manage_emojis" in firstperms.selected_options else False
-        roleperm.manage_guild = True if "manage_guild" in firstperms.selected_options else False
-        roleperm.manage_messages = True if "manage_messages" in firstperms.selected_options else False
-        roleperm.manage_nicknames = True if "manage_nicknames" in firstperms.selected_options else False
-        roleperm.manage_permissions = True if "manage_permissions" in firstperms.selected_options else False
-        roleperm.manage_roles = True if "manage_roles" in firstperms.selected_options else False
-        roleperm.manage_webhooks = True if "manage_webhooks" in firstperms.selected_options else False
-
-        sel2 = manage_components.create_select(
-            placeholder="Choose the permissions you want for your role (2/2)",
-            max_values=17, min_values=1,
-            options=[
-                create_select_option(
-                    label="mention everyone in a message",
-                    value="mention_everyone",
-                ),
-                create_select_option(
-                    label="move members across voice channels",
-                    value="move_members",
-                ),
-                create_select_option(
-                    label="mute members in voice channels",
-                    value="mute_members",
-                ),
-                create_select_option(
-                    label="priority speaker",
-                    value="priority_speaker",
-                ),
-                create_select_option(
-                    label="read message history in channels",
-                    value="read_message_history",
-                ),
-                create_select_option(
-                    label="read all messages in channels",
-                    value="read_messages",
-                ),
-                create_select_option(
-                    label="request to speak in stage channels",
-                    value="request_to_speak",
-                ),
-                create_select_option(
-                    label="send messages in channels",
-                    value="send_messages",
-                ),
-                create_select_option(
-                    label="send TTS messages in channels",
-                    value="send_tts_messages",
-                ),
-                create_select_option(
-                    label="speak in voice channels",
-                    value="speak",
-                ),
-                create_select_option(
-                    label="stream in voice channels",
-                    value="stream",
-                ),
-                create_select_option(
-                    label="use external emojis",
-                    value="use_external_emojis",
-                ),
-                create_select_option(
-                    label="use slash commands in channels",
-                    value="use_slash_commands",
-                ),
-                create_select_option(
-                    label="use voice activation in voice channels (else only push-to-talk)",
-                    value="use_voice_activation",
-                ),
-                create_select_option(
-                    label="view the audit-log",
-                    value="view_audit_log",
-                ),
-                create_select_option(
-                    label="view channels",
-                    value="view_channel",
-                ),
-                create_select_option(
-                    label="view guild insights",
-                    value="view_guild_insights",
-                ),
-            ],
-        )
-        sel2row = manage_components.create_actionrow(sel2)
-        await firstperms.edit_origin(
-            content="Please choose the permissions you want to assign to the role (2/2)",
-            components=[sel2row],
-        )
-
-        try:
-            secondperms = await wait_for_component(self.bot, components=[sel2row], timeout=600)
-            await secondperms.defer(edit_origin=True)
-        except asyncio.TimeoutError:
-            sel2row["components"][0]["disabled"] = True
-            await firstperms.origin_message.edit("Timed out.", components=[sel2row])
-            return
-
-        roleperm.mention_everyone = True if "mention_everyone" in secondperms.selected_options else False
-        roleperm.move_members = True if "move_members" in secondperms.selected_options else False
-        roleperm.mute_members = True if "mute_members" in secondperms.selected_options else False
-        roleperm.priority_speaker = True if "priority_speaker" in secondperms.selected_options else False
-        roleperm.read_message_history = True if "read_message_history" in secondperms.selected_options else False
-        roleperm.read_messages = True if "read_messages" in secondperms.selected_options else False
-        roleperm.request_to_speak = True if "request_to_speak" in secondperms.selected_options else False
-        roleperm.send_messages = True if "send_messages" in secondperms.selected_options else False
-        roleperm.send_tts_messages = True if "send_tts_messages" in secondperms.selected_options else False
-        roleperm.speak = True if "speak" in secondperms.selected_options else False
-        roleperm.stream = True if "stream" in secondperms.selected_options else False
-        roleperm.use_external_emojis = True if "use_external_emojis" in secondperms.selected_options else False
-        roleperm.use_slash_commands = True if "use_slash_commands" in secondperms.selected_options else False
-        roleperm.use_voice_activation = True if "use_voice_activation" in secondperms.selected_options else False
-        roleperm.view_audit_log = True if "view_audit_log" in secondperms.selected_options else False
-        roleperm.view_channel = True if "view_channel" in secondperms.selected_options else False
-        roleperm.view_guild_insights = True if "view_guild_insights" in secondperms.selected_options else False
+            try:
+                roleperm, sel2row, secondperms = await self._get_role_permissions(ctx=admin, roleperm=roleperm)
+            except ValueError:  # on timeout no values returned, just do nothing then
+                return
 
         sel2row["components"][0]["disabled"] = True
         await secondperms.edit_origin(
@@ -858,16 +870,117 @@ class ServerUtils(Cog):
             components=[sel2row]
         ),
         await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable)
+
         await ctx.channel.send("Done!")
 
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
+    redt_opt = [
+        {
+            "name": "role",
+            "description": "the role you want to edit",
+            "required": True,
+            "type": 8,
+        },
+        {
+            "name": "name",
+            "description": "the new name of the role",
+            "required": False,
+            "type": 3,
+        },
+        {
+            "name": "color",
+            "description": "the new colour of the role (hex code)",
+            "type": 3,
+            "required": False,
+        },
+        {
+            "name": "hoist",
+            "description": "whether the role should be shown separately in the member list",
+            "required": False,
+            "type": 5,
+        },
+        {
+            "name": "mentionable",
+            "description": "whether everyone should be able to mention the role",
+            "required": False,
+            "type": 5,
+        },
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role",
+                            options=redt_opt)
+    async def _role_edit(self, ctx: SlashContext, role: discord.Role, name: str = None, color: str = None,
+                         hoist: bool = None, mentionable: bool = None):
+
+        if not ctx.author.guild_permissions.manage_roles:
+            raise discord.ext.commands.errors.MissingPermissions(missing_perms=["manage_roles"])
+
+        if not name:
+            name = role.name
+
+        if not hoist:
+            hoist = role.hoist
+
+        if not mentionable:
+            mentionable = role.mentionable
+
+        if color:
+            match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)  # check if color is hex
+            if not match:
+                raise discord.ext.commands.BadArgument("color is not a hex-color code")
+            await ctx.defer(hidden=False)
+            hexval = color.lstrip("#")
+            rgbval = tuple(bytes.fromhex(hexval))
+            color = discord.Colour.from_rgb(r=rgbval[0], g=rgbval[1], b=rgbval[2])
+
+        elif not color:
+            await ctx.defer(hidden=False)
+            color = role.colour
+
+        perm_edt = [
+            manage_components.create_button(
+                label="Yes", style=ButtonStyle.green,
+                custom_id="yes",
+            ),
+            manage_components.create_button(
+                label="No", style=ButtonStyle.red,
+                custom_id="no",
+            ),
+        ]
+
+        perm_ar = manage_components.create_actionrow(*perm_edt)
+
+        msg = await ctx.send("Do you want to edit the permissions of the role?", components=[perm_ar])
+
+        try:
+            perm: ComponentContext = await wait_for_component(self.bot, components=[perm_ar], timeout=600,
+                                                              check= lambda m: m.author.id == ctx.author.id)
+            await perm.defer(edit_origin=True)
+
+        except asyncio.TimeoutError:
+            for i in range(2):
+                perm_ar["components"][i]["disabled"] = True
+            await msg.edit(content="Timed out.", components=[perm_ar])
+            return
+
+        if perm.custom_id == "no":
+            roleperm = role.permissions
+            for i in range(2):
+                perm_ar["components"][i]["disabled"] = True
+            await perm.edit_origin(
+                content="editing the role without changing permissions?",
+                components=[perm_ar]
+            )
+            await role.edit(permissions=roleperm, name=name, hoist=hoist, mentionable=mentionable, colour=color)
+            await perm.origin_message.edit(content="Done")
+
+
 
     rdel_opt = [
         {
             "name": "role",
             "description": "the role to delete",
             "required": True,
-            "type": 8
+            "type": 8,
         }
     ]
 
