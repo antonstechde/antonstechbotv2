@@ -840,7 +840,7 @@ class ServerUtils(Cog):
         except asyncio.TimeoutError:
             for i in range(2):
                 adm_ar["components"][i]["disabled"] = True
-            await ask.edit(
+            await answer.origin_message.edit(
                 content="Timed out.", components=[adm_ar]
             )
             return
@@ -948,12 +948,21 @@ class ServerUtils(Cog):
         ]
 
         perm_ar = manage_components.create_actionrow(*perm_edt)
+        adminbutton = [
+            manage_components.create_button(
+                label="Yes", style=ButtonStyle.green, custom_id="yes"
+            ),
+            manage_components.create_button(
+                label="No", style=ButtonStyle.red, custom_id="no"
+            ),
+        ]
+        adm_ar = manage_components.create_actionrow(*adminbutton)
 
         msg = await ctx.send("Do you want to edit the permissions of the role?", components=[perm_ar])
 
         try:
             perm: ComponentContext = await wait_for_component(self.bot, components=[perm_ar], timeout=600,
-                                                              check= lambda m: m.author.id == ctx.author.id)
+                                                              check=lambda m: m.author.id == ctx.author.id)
             await perm.defer(edit_origin=True)
 
         except asyncio.TimeoutError:
@@ -972,8 +981,56 @@ class ServerUtils(Cog):
             )
             await role.edit(permissions=roleperm, name=name, hoist=hoist, mentionable=mentionable, colour=color)
             await perm.origin_message.edit(content="Done")
+            return
 
+        else:
+            await perm.edit_origin(
+                content="Do you want the role to have administrator-permissions?",
+                components=[adm_ar]
+            )
+            try:
+                admin: ComponentContext = await wait_for_component(self.bot, components=[adm_ar], timeout=600,
+                                                                   check=lambda msg: msg.author.id == ctx.author.id)
+                await admin.defer(edit_origin=True)
+            except asyncio.TimeoutError:
+                for i in range(2):
+                    adm_ar["components"][i]["disabled"] = True
+                await perm.origin_message.edit(
+                    content="Timed out.", components=[adm_ar]
+                )
+                return
 
+            if admin.component_id == "yes":
+                roleperm = discord.Permissions().none()
+                roleperm.administrator = True
+                for i in range(2):
+                    adm_ar["components"][i]["disabled"] = True
+                await admin.edit_origin(
+                    content=f"editing role to admin-permissions",
+                    components=[adm_ar]
+                )
+                await role.edit(name=name, color=color, permissions=roleperm, hoist=hoist,
+                                mentionable=mentionable)
+                await ctx.channel.send("Done")
+                return
+
+            else:
+                try:
+                    roleperm = discord.Permissions().none()
+                    roleperm, sel2row, secondperms = await self._get_role_permissions(ctx=admin, roleperm=roleperm)
+
+                    sel2row["components"][0]["disabled"] = True
+
+                    secondperms.edit_origin(
+                        components=[sel2row],
+                        content="Edting role to your input....."
+                    )
+
+                    await role.edit(name=name, hoist=hoist, colour=color, mentionable=mentionable,
+                                    permissions=roleperm)
+                    await secondperms.origin_message.edit(content="Done")
+                except ValueError:  # on timeout no values returned, just do nothing then
+                    return
 
     rdel_opt = [
         {
