@@ -511,7 +511,7 @@ class ServerUtils(Cog):
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="add-role", description="adds a role to a user")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="remove-role", description="removes a role from a user")
 
-    cre_opt = [
+    rcre_opt = [
         {
             "name": "name",
             "description": "the name of the role",
@@ -524,10 +524,23 @@ class ServerUtils(Cog):
             "type": 3,
             "required": True,
         },
+        {
+            "name": "hoist",
+            "description": "whether the role should be shown separately in the member list, default False",
+            "required": False,
+            "type": 5,
+        },
+        {
+            "name": "mentionable",
+            "description": "whether everyone should be able to mention the role, default False",
+            "required": False,
+            "type": 5,
+        },
     ]
 
-    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role")
-    async def _create_role(self, ctx: SlashContext, name: str, color: str):
+    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role",
+                            options=rcre_opt)
+    async def _create_role(self, ctx: SlashContext, name: str, color: str, hoist: bool = False, mentionable: bool = False):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.errors.MissingPermissions(missing_perms=["manage_roles"])
         match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)  # check if color is hex
@@ -585,7 +598,7 @@ class ServerUtils(Cog):
                 content=f"creating role '{name}' with the color #{hexval} and no permissions....",
                 components=[any_ar]
             )
-            await ctx.guild.create_role(name=name, color=color, permissions=roleperm)
+            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable)
             await ctx.channel.send("Done")
             return
 
@@ -615,7 +628,7 @@ class ServerUtils(Cog):
                 content=f"creating role '{name}' with the color #{hexval} and administrator permissions....",
                 components=[adm_ar]
             )
-            await ctx.guild.create_role(name=name, color=color, permissions=roleperm)
+            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable)
             await ctx.channel.send("Done")
             return
 
@@ -812,7 +825,7 @@ class ServerUtils(Cog):
             content="Please choose the permissions you want to assign to the role (2/2)",
             components=[sel2row],
         )
-        
+
         try:
             secondperms = await wait_for_component(self.bot, components=[sel2row], timeout=600)
             await secondperms.defer(edit_origin=True)
@@ -844,12 +857,27 @@ class ServerUtils(Cog):
             content=f"Role '{name}' with color #{hexval} and your custom permissions, which have the value {roleperm.value}, is being created",
             components=[sel2row]
         ),
-        await ctx.guild.create_role(name=name, color=color, permissions=roleperm)
+        await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable)
         await ctx.channel.send("Done!")
 
-
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="delete", description="deletes a role")
+
+    rdel_opt = [
+        {
+            "name": "role",
+            "description": "the role to delete",
+            "required": True,
+            "type": 8
+        }
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="delete", description="deletes a role",
+                            options=rdel_opt)
+    async def _delete_role(self, ctx: SlashContext, role: discord.Role):
+        if not ctx.author.guild_permissions.manage_roles:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_roles"])
+        await role.delete()
+        await ctx.send("role has been deleted")
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="create", description="creates a channel")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="edit", description="edits a channel") # not sure about that one
