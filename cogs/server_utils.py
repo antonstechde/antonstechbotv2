@@ -623,7 +623,7 @@ class ServerUtils(Cog):
             pass
 
         sel = manage_components.create_select(
-            placeholder="Choose the permissions you want for your role",
+            placeholder="Choose the permissions you want for your role (1/2)",
             min_values=1, max_values=18,
             options=[
                 create_select_option(
@@ -726,12 +726,126 @@ class ServerUtils(Cog):
         roleperm.kick_members = True if "kick_members" in firstperms.selected_options else False
         roleperm.manage_channels = True if "manage_channels" in firstperms.selected_options else False
         roleperm.manage_emojis = True if "manage_emojis" in firstperms.selected_options else False
-        roleperm.manage_guild = True if "add_reactions" in firstperms.selected_options else False
-        roleperm.manage_messages = True if "manage_nicknames" in firstperms.selected_options else False
-        roleperm.manage_nicknames = True if "add_reactions" in firstperms.selected_options else False
+        roleperm.manage_guild = True if "manage_guild" in firstperms.selected_options else False
+        roleperm.manage_messages = True if "manage_messages" in firstperms.selected_options else False
+        roleperm.manage_nicknames = True if "manage_nicknames" in firstperms.selected_options else False
         roleperm.manage_permissions = True if "manage_permissions" in firstperms.selected_options else False
         roleperm.manage_roles = True if "manage_roles" in firstperms.selected_options else False
         roleperm.manage_webhooks = True if "manage_webhooks" in firstperms.selected_options else False
+
+        sel2 = manage_components.create_select(
+            placeholder="Choose the permissions you want for your role (2/2)",
+            max_values=17, min_values=1,
+            options=[
+                create_select_option(
+                    label="mention everyone in a message",
+                    value="mention_everyone",
+                ),
+                create_select_option(
+                    label="move members across voice channels",
+                    value="move_members",
+                ),
+                create_select_option(
+                    label="mute members in voice channels",
+                    value="mute_members",
+                ),
+                create_select_option(
+                    label="priority speaker",
+                    value="priority_speaker",
+                ),
+                create_select_option(
+                    label="read message history in channels",
+                    value="read_message_history",
+                ),
+                create_select_option(
+                    label="read all messages in channels",
+                    value="read_messages",
+                ),
+                create_select_option(
+                    label="request to speak in stage channels",
+                    value="request_to_speak",
+                ),
+                create_select_option(
+                    label="send messages in channels",
+                    value="send_messages",
+                ),
+                create_select_option(
+                    label="send TTS messages in channels",
+                    value="send_tts_messages",
+                ),
+                create_select_option(
+                    label="speak in voice channels",
+                    value="speak",
+                ),
+                create_select_option(
+                    label="stream in voice channels",
+                    value="stream",
+                ),
+                create_select_option(
+                    label="use external emojis",
+                    value="use_external_emojis",
+                ),
+                create_select_option(
+                    label="use slash commands in channels",
+                    value="use_slash_commands",
+                ),
+                create_select_option(
+                    label="use voice activation in voice channels (else only push-to-talk)",
+                    value="use_voice_activation",
+                ),
+                create_select_option(
+                    label="view the audit-log",
+                    value="view_audit_log",
+                ),
+                create_select_option(
+                    label="view channels",
+                    value="view_channel",
+                ),
+                create_select_option(
+                    label="view guild insights",
+                    value="view_guild_insights",
+                ),
+            ],
+        )
+        sel2row = manage_components.create_actionrow(sel2)
+        await firstperms.edit_origin(
+            content="Please choose the permissions you want to assign to the role (2/2)",
+            components=[sel2row],
+        )
+        
+        try:
+            secondperms = await wait_for_component(self.bot, components=[sel2row], timeout=600)
+            await secondperms.defer(edit_origin=True)
+        except asyncio.TimeoutError:
+            sel2row["components"][0]["disabled"] = True
+            await firstperms.origin_message.edit("Timed out.", components=[sel2row])
+            return
+
+        roleperm.mention_everyone = True if "mention_everyone" in secondperms.selected_options else False
+        roleperm.move_members = True if "move_members" in secondperms.selected_options else False
+        roleperm.mute_members = True if "mute_members" in secondperms.selected_options else False
+        roleperm.priority_speaker = True if "priority_speaker" in secondperms.selected_options else False
+        roleperm.read_message_history = True if "read_message_history" in secondperms.selected_options else False
+        roleperm.read_messages = True if "read_messages" in secondperms.selected_options else False
+        roleperm.request_to_speak = True if "request_to_speak" in secondperms.selected_options else False
+        roleperm.send_messages = True if "send_messages" in secondperms.selected_options else False
+        roleperm.send_tts_messages = True if "send_tts_messages" in secondperms.selected_options else False
+        roleperm.speak = True if "speak" in secondperms.selected_options else False
+        roleperm.stream = True if "stream" in secondperms.selected_options else False
+        roleperm.use_external_emojis = True if "use_external_emojis" in secondperms.selected_options else False
+        roleperm.use_slash_commands = True if "use_slash_commands" in secondperms.selected_options else False
+        roleperm.use_voice_activation = True if "use_voice_activation" in secondperms.selected_options else False
+        roleperm.view_audit_log = True if "view_audit_log" in secondperms.selected_options else False
+        roleperm.view_channel = True if "view_channel" in secondperms.selected_options else False
+        roleperm.view_guild_insights = True if "view_guild_insights" in secondperms.selected_options else False
+
+        sel2row["components"][0]["disabled"] = True
+        await secondperms.edit_origin(
+            content=f"Role '{name}' with color #{hexval} and your custom permissions, which have the value {roleperm.value}, is being created",
+            components=[sel2row]
+        ),
+        await ctx.guild.create_role(name=name, color=color, permissions=roleperm)
+        await ctx.channel.send("Done!")
 
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
