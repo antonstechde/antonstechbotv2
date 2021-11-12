@@ -103,7 +103,8 @@ class ServerUtils(Cog):
         )
 
         try:
-            firstperms = await wait_for_component(self.bot, components=[selrow], timeout=600)
+            firstperms = await wait_for_component(self.bot, components=[selrow], timeout=600,
+                                                  check=lambda msg: msg.author.id == ctx.author.id)
             await firstperms.defer(edit_origin=True)
         except asyncio.TimeoutError:
             selrow["components"][0]["disabled"] = True
@@ -210,7 +211,8 @@ class ServerUtils(Cog):
         )
 
         try:
-            secondperms = await wait_for_component(self.bot, components=[sel2row], timeout=600)
+            secondperms = await wait_for_component(self.bot, components=[sel2row], timeout=600,
+                                                   check=lambda msg: msg.author.id == ctx.author.id)
             await secondperms.defer(edit_origin=True)
         except asyncio.TimeoutError:
             sel2row["components"][0]["disabled"] = True
@@ -760,7 +762,8 @@ class ServerUtils(Cog):
 
     @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="create", description="creates a role",
                             options=rcre_opt)
-    async def _create_role(self, ctx: SlashContext, name: str, color: str, hoist: bool = False, mentionable: bool = False):
+    async def _create_role(self, ctx: SlashContext, name: str, color: str, hoist: bool = False,
+                           mentionable: bool = False):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.errors.MissingPermissions(missing_perms=["manage_roles"])
         match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)  # check if color is hex
@@ -818,7 +821,8 @@ class ServerUtils(Cog):
                 content=f"creating role '{name}' with the color #{hexval} and no permissions....",
                 components=[any_ar]
             )
-            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable)
+            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist,
+                                        mentionable=mentionable)
             await ctx.channel.send("Done")
             return
 
@@ -830,7 +834,8 @@ class ServerUtils(Cog):
             components=[adm_ar]
         )
         try:
-            admin: ComponentContext = await wait_for_component(self.bot, components=[adm_ar], timeout=600)
+            admin: ComponentContext = await wait_for_component(self.bot, components=[adm_ar], timeout=600,
+                                                               check=lambda msg: msg.author.id == ctx.author.id)
             await admin.defer(edit_origin=True)
         except asyncio.TimeoutError:
             for i in range(2):
@@ -848,7 +853,8 @@ class ServerUtils(Cog):
                 content=f"creating role '{name}' with the color #{hexval} and administrator permissions....",
                 components=[adm_ar]
             )
-            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable)
+            await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist,
+                                        mentionable=mentionable)
             await ctx.channel.send("Done")
             return
 
@@ -867,14 +873,114 @@ class ServerUtils(Cog):
 
         await ctx.channel.send("Done!")
 
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role")
+    redt_opt = [
+        {
+            "name": "role",
+            "description": "the role you want to edit",
+            "required": True,
+            "type": 8,
+        },
+        {
+            "name": "name",
+            "description": "the new name of the role",
+            "required": False,
+            "type": 3,
+        },
+        {
+            "name": "color",
+            "description": "the new colour of the role (hex code)",
+            "type": 3,
+            "required": False,
+        },
+        {
+            "name": "hoist",
+            "description": "whether the role should be shown separately in the member list",
+            "required": False,
+            "type": 5,
+        },
+        {
+            "name": "mentionable",
+            "description": "whether everyone should be able to mention the role",
+            "required": False,
+            "type": 5,
+        },
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="role", name="edit", description="edits a role",
+                            options=redt_opt)
+    async def _role_edit(self, ctx: SlashContext, role: discord.Role, name: str = None, color: str = None,
+                         hoist: bool = None, mentionable: bool = None):
+
+        if not ctx.author.guild_permissions.manage_roles:
+            raise discord.ext.commands.errors.MissingPermissions(missing_perms=["manage_roles"])
+
+        if not name:
+            name = role.name
+
+        if not hoist:
+            hoist = role.hoist
+
+        if not mentionable:
+            mentionable = role.mentionable
+
+        if color:
+            match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)  # check if color is hex
+            if not match:
+                raise discord.ext.commands.BadArgument("color is not a hex-color code")
+            await ctx.defer(hidden=False)
+            hexval = color.lstrip("#")
+            rgbval = tuple(bytes.fromhex(hexval))
+            color = discord.Colour.from_rgb(r=rgbval[0], g=rgbval[1], b=rgbval[2])
+
+        elif not color:
+            await ctx.defer(hidden=False)
+            color = role.colour
+
+        perm_edt = [
+            manage_components.create_button(
+                label="Yes", style=ButtonStyle.green,
+                custom_id="yes",
+            ),
+            manage_components.create_button(
+                label="No", style=ButtonStyle.red,
+                custom_id="no",
+            ),
+        ]
+
+        perm_ar = manage_components.create_actionrow(*perm_edt)
+
+        msg = await ctx.send("Do you want to edit the permissions of the role?", components=[perm_ar])
+
+        try:
+            perm: ComponentContext = await wait_for_component(self.bot, components=[perm_ar], timeout=600,
+                                                              check= lambda m: m.author.id == ctx.author.id)
+            await perm.defer(edit_origin=True)
+
+        except asyncio.TimeoutError:
+            for i in range(2):
+                perm_ar["components"][i]["disabled"] = True
+            await msg.edit(content="Timed out.", components=[perm_ar])
+            return
+
+        if perm.custom_id == "no":
+            roleperm = role.permissions
+            for i in range(2):
+                perm_ar["components"][i]["disabled"] = True
+            await perm.edit_origin(
+                content="editing the role without changing permissions?",
+                components=[perm_ar]
+            )
+            await role.edit(permissions=roleperm, name=name, hoist=hoist, mentionable=mentionable, colour=color)
+            await perm.origin_message.edit(content="Done")
+
+
 
     rdel_opt = [
         {
             "name": "role",
             "description": "the role to delete",
             "required": True,
-            "type": 8
+            "type": 8,
         }
     ]
 
