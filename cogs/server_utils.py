@@ -980,7 +980,7 @@ class ServerUtils(Cog):
                 components=[perm_ar]
             )
             await role.edit(permissions=roleperm, name=name, hoist=hoist, mentionable=mentionable, colour=color)
-            await perm.origin_message.edit(content="Done")
+            await perm.origin_message.channel.send(content="Done")
             return
 
         else:
@@ -1011,7 +1011,7 @@ class ServerUtils(Cog):
                 )
                 await role.edit(name=name, color=color, permissions=roleperm, hoist=hoist,
                                 mentionable=mentionable)
-                await ctx.channel.send("Done")
+                await admin.origin_message.channel.send("Done")
                 return
 
             else:
@@ -1021,14 +1021,14 @@ class ServerUtils(Cog):
 
                     sel2row["components"][0]["disabled"] = True
 
-                    secondperms.edit_origin(
+                    await secondperms.edit_origin(
                         components=[sel2row],
                         content="Edting role to your input....."
                     )
 
                     await role.edit(name=name, hoist=hoist, colour=color, mentionable=mentionable,
                                     permissions=roleperm)
-                    await secondperms.origin_message.edit(content="Done")
+                    await secondperms.origin_message.channel.send(content="Done")
                 except ValueError:  # on timeout no values returned, just do nothing then
                     return
 
