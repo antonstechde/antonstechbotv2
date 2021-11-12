@@ -1,4 +1,5 @@
 # antonstechbotv2
+![Discord Bots](https://top.gg/api/widget/upvotes/744218316167708773.svg)
 - [Invite here](https://top.gg/bot/744218316167708773) (if you don't want to host it yourself)
 - [Setup](https://github.com/antonstechde/antonstechbotv2/wiki/Setup)
 - [Databases-Stuff](https://github.com/antonstechde/antonstechbotv2/wiki/Databases)
