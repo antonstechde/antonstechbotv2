@@ -283,7 +283,11 @@ class ServerUtils(Cog):
                 not ctx.author.guild_permissions.ban_members
                 and not ctx.author.guild_permissions.kick_members
                 and not ctx.author.guild_permissions.manage_messages):
-            raise discord.ext.commands.MissingPermissions  # raise some error you like
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_messages", "ban_members", "kick_members"])  # raise some error you like
+
+        if not ctx.author.guild_permissions.ban_members or not ctx.author.guild_permissions.kick_members:
+            for i in range(2):
+                user_buttons_actionrow1["components"][i]["disabled"] = True
         message = await ctx.send(
             f"What do you want to do with {user.mention}? (timeout: 60 seconds)",
             hidden=False,
