@@ -744,8 +744,50 @@ class ServerUtils(Cog):
         await ctx.send(f"unbanned {user.mention}!")
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="add-role", description="adds a role to a user")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="remove-role", description="removes a role from a user")
+
+    radd_opt = [
+        {
+            "name": "user",
+            "description": "the user to add the role to",
+            "required": True,
+            "type": 6,
+        },
+        {
+            "name": "role",
+            "description": "the role to add",
+            "type": 8
+        }
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="add-role",
+                            description="adds a role to a user", options=radd_opt)
+    async def _role_add(self, ctx: SlashContext, user: discord.Member, role: discord.Role):
+        if not ctx.author.guild_permissions.manage_roles:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_roles"])
+        await user.add_roles([role])
+        await ctx.send("Done!")
+
+    rrem_opt = [
+        {
+            "name": "user",
+            "description": "the user to remove the role from",
+            "required": True,
+            "type": 6,
+        },
+        {
+            "name": "role",
+            "description": "the role to remove",
+            "type": 8
+        }
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="remove-role",
+                            description="removes a role from a user", options=rrem_opt)
+    async def _role_remove(self, ctx: SlashContext, user: discord.Member, role: discord.Role):
+        if not ctx.author.guild_permissions.manage_roles:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_roles"])
+        await user.remove_roles([role])
+        await ctx.send("Done!")
 
     rcre_opt = [
         {
