@@ -725,6 +725,16 @@ class ServerUtils(Cog):
             await buttons.origin_message.delete()
             await punishments.ban(ctx, user, reason)
 
+        if buttons.component_id == "nothing":
+            for i in range(2):
+                user_buttons_actionrow1["components"][i]["disabled"] = True
+                user_buttons_actionrow2["components"][i]["disabled"] = True
+            user_buttons_actionrow3["components"][0]["disabled"] = True
+            await buttons.edit_origin(
+                content="ok nothing will happen",
+                components=[user_buttons_actionrow1, user_buttons_actionrow2, user_buttons_actionrow3]
+            )
+
     @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="unban", description="unbans a user")
     async def _unban(self, ctx: SlashContext, user_id: str,
                      reason: str):  # in theory discord-slash should automatically create options for that
