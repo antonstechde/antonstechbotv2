@@ -764,7 +764,7 @@ class ServerUtils(Cog):
     async def _role_add(self, ctx: SlashContext, user: discord.Member, role: discord.Role):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.MissingPermissions(missing_perms=["manage_roles"])
-        await user.add_roles([role])
+        await user.add_roles(role)
         await ctx.send("Done!")
 
     rrem_opt = [
@@ -786,7 +786,7 @@ class ServerUtils(Cog):
     async def _role_remove(self, ctx: SlashContext, user: discord.Member, role: discord.Role):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.MissingPermissions(missing_perms=["manage_roles"])
-        await user.remove_roles([role])
+        await user.remove_roles(role)
         await ctx.send("Done!")
 
     rcre_opt = [
