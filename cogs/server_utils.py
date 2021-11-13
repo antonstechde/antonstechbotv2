@@ -755,8 +755,9 @@ class ServerUtils(Cog):
         {
             "name": "role",
             "description": "the role to add",
-            "type": 8
-        }
+            "type": 8,
+            "required": True,
+        },
     ]
 
     @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="add-role",
@@ -777,8 +778,9 @@ class ServerUtils(Cog):
         {
             "name": "role",
             "description": "the role to remove",
-            "type": 8
-        }
+            "type": 8,
+            "required": True,
+        },
     ]
 
     @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="remove-role",
