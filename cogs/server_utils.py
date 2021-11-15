@@ -1,11 +1,14 @@
 import asyncio
 import discord
 import re
+
+import discord_slash.model
 from discord.ext.commands import Cog, AutoShardedBot
 from discord_slash import cog_ext, SlashContext, ButtonStyle, ComponentContext
 from discord_slash.utils import manage_components
 from discord_slash.utils.manage_components import wait_for_component, create_select_option
 from utils import utils, punishments
+from typing import Union
 
 
 class ServerUtils(Cog):
@@ -283,7 +286,8 @@ class ServerUtils(Cog):
                 not ctx.author.guild_permissions.ban_members
                 and not ctx.author.guild_permissions.kick_members
                 and not ctx.author.guild_permissions.manage_messages):
-            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_messages", "ban_members", "kick_members"])  # raise some error you like
+            raise discord.ext.commands.MissingPermissions(
+                missing_perms=["manage_messages", "ban_members", "kick_members"])  # raise some error you like
 
         if not ctx.author.guild_permissions.ban_members or not ctx.author.guild_permissions.kick_members:
             for i in range(2):
@@ -743,7 +747,7 @@ class ServerUtils(Cog):
         await ctx.guild.unban(user=user, reason=reason)
         await ctx.send(f"unbanned {user.mention}!")
 
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")
+    # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")   # TODO: work on this when mute and warn system done
 
     radd_opt = [
         {
@@ -1105,14 +1109,138 @@ class ServerUtils(Cog):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.MissingPermissions(missing_perms=["manage_roles"])
         await role.delete()
-        await ctx.send("role has been deleted")
+        await ctx.send("role has been deleted", hidden=True)
 
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="create", description="creates a channel")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="edit", description="edits a channel") # not sure about that one
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="delete", description="deletes a channel")
+    ch_cre_opt = [
+        {
+            "name": "channel_type",
+            "description": "Text or Voice Channel",
+            "required": True,
+            "choices": [
+                {
+                    "name": "Text-channel",
+                    "value": discord.TextChannel,
+                },
+                {
+                    "name": "Voice-channel",
+                    "value": discord.VoiceChannel,
+                },
+            ],
+        },
+        {
+            "name": "name",
+            "description": "the name of the channel",
+            "type": 3,
+            "required": True,
+        },
+        {
+            "name": "category",
+            "description": "the category to add the channel to",
+            "type": 7,
+            "required": True,
+        },
+        {
+            "name": "nsfw",
+            "description": "whether the channel is nsfw. Default False (Text-Channel only)",
+            "type": 5,
+            "required": False,
+        },
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="create",
+                            description="creates a channel", options=ch_cre_opt)
+    async def _channel_create(self, ctx: SlashContext, channel_type: Union[discord.VoiceChannel, discord.TextChannel],
+                              name: str, category: discord.CategoryChannel, nsfw: bool = False):
+        if not ctx.author.guild_permissions.manage_channels:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
+        await ctx.defer(hidden=True)
+        if isinstance(channel_type, discord.TextChannel):
+            await ctx.guild.create_text_channel(name=name, category=category, nsfw=nsfw)
+
+        elif isinstance(channel_type, discord.VoiceChannel):
+            await ctx.guild.create_voice_channel(name=name, category=category)
+        await ctx.send("done", hidden=True)
+
+    ch_edt_opt = [
+        {
+            "name": "channel",
+            "description": "The channel to edit",
+            "type": 7,
+            "required": True,
+        },
+        {
+            "name": "name",
+            "description": "The new name of the channel",
+            "type": 3,
+            "required": False,
+        },
+        {
+            "name": "slowmode_delay",
+            "description": "set the slowmode for the channel (only for text channels)",
+            "type": 4,
+            "required": False,
+        },
+        {
+            "name": "max_user_count",
+            "description": "set the max user count for the channel (only for voice channels",
+            "type": 4,
+            "required": False,
+        },
+        {
+            "name": "nsfw",
+            "description": "whether the channel is nsfw. (Text-Channel only)",
+            "type": 5,
+            "required": False,
+        },
+        {
+            "name": "position",
+            "description": "the position of the channel",
+            "type": 4,
+            "required": False,
+        },
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="edit",
+                            description="edits a channel", options=ch_edt_opt)
+    async def _channel_edit(self, ctx: SlashContext, channel: Union[discord.TextChannel, discord.VoiceChannel],
+                            name: str = None, slowmode_delay: int = None,
+                            max_user_count: int = None, nsfw: bool = None,
+                            position: int = None):
+        if not ctx.author.guild_permissions.manage_channels:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
+        await ctx.defer(hidden=True)
+        if isinstance(channel, discord.TextChannel):
+            await channel.edit(name=name if name is not None else channel.name,
+                               slowmode_delay=slowmode_delay if slowmode_delay is not None else channel.slowmode_delay,
+                               nsfw=nsfw if nsfw is not None else channel.nsfw,
+                               position=position if nsfw is not None else channel.position)
+        elif isinstance(channel, discord.VoiceChannel):
+            await channel.edit(name=name if name is not None else channel.name,
+                               user_limit=max_user_count if max_user_count is not None else channel.user_limit,
+                               position=position if nsfw is not None else channel.position)
+        await ctx.send("done", hidden=True)
+
+    # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="permission_edit", description="edits the permissions a user or a role has in a specific channel")
+
+    ch_del_opt = [
+        {
+            "name": "channel",
+            "description": "The channel to edit",
+            "type": 7,
+            "required": True,
+        },
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="delete",
+                            description="deletes a channel", options=ch_del_opt)
+    async def _channel_delete(self, ctx: SlashContext, channel: Union[discord.TextChannel, discord.VoiceChannel]):
+        if not ctx.author.guild_permissions.manage_channels:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
+        await channel.delete()
+        await ctx.send("done", hidden=True)
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="create", description="creates a category")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="edit", description="edits a category") # not sure about that one
+    # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="edit", description="edits a category")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="delete", description="deletes a category")
 
 
