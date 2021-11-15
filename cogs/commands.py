@@ -18,11 +18,6 @@ class Commands(Cog):
         self.bot = bot
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
-    @cog_ext.cog_slash(name="about")
-    async def _about(self, ctx: SlashContext):
-        embed = Embed(title="Embed Test")
-        await ctx.send(embed=embed)
-
     @cog_ext.cog_slash(name="invite", description="Lets you invite the Bot")
     async def _bot_invite(self, ctx: SlashContext):
         embed = discord.Embed()
