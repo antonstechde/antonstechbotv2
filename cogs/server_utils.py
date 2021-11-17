@@ -1516,7 +1516,7 @@ class ServerUtils(Cog):
             "name": "role_or_user",
             "description": "if you specify this, you will be able to edit the permissions for a role or a user in that category",
             "type": 9,
-            "required": True,
+            "required": False,
         },
     ]
 
