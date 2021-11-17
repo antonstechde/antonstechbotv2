@@ -1358,9 +1358,96 @@ class ServerUtils(Cog):
 
         elif isinstance(channel, discord.VoiceChannel):
 
-            # await channel.edit(overwrites=perm_overwrite,
-            #                  reason=f"User {ctx.author.name} used the channel-permission-edit command!")
-            ...
+            perm_sel = manage_components.create_select(
+                min_values=1, max_values=12,
+                placeholder=f"choose the permissions to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}",
+                options=[
+                    create_select_option(
+                        label="view the channel", value="view_channel",
+                    ),
+                    create_select_option(
+                        label="manage the channel", value="manage_channel",
+                    ),
+                    create_select_option(
+                        label="manage channel permissions", value="manage_permissions",
+                    ),
+                    create_select_option(
+                        label="create instant invite", value="create_instant_invite",
+                    ),
+                    create_select_option(
+                        label="connect to the channel", value="connect",
+                    ),
+                    create_select_option(
+                        label="speak in the channel", value="speak",
+                    ),
+                    create_select_option(
+                        label="enable camera", value="video",
+                    ),
+                    create_select_option(
+                        label="use voice activation", value="use_voice_activation",
+                    ),
+                    create_select_option(
+                        label="very important speaker", value="priority_speaker",
+                    ),
+                    create_select_option(
+                        label="mute members", value="mute_members",
+                    ),
+                    create_select_option(
+                        label="deafen members", value="deafen_members",
+                    ),
+                    create_select_option(
+                        label="move members in another channel", value="move_members",
+                    ),
+                ]
+            )
+            sel_ar = manage_components.create_actionrow(perm_sel)
+            msg = await ctx.send(
+                content=f"What Permissions do you want to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}"
+                        f"all not selected permissions will be **denied**",
+                components=[sel_ar]
+            )
+
+            try:
+                perms: ComponentContext = await wait_for_component(self.bot, components=[sel_ar],
+                                                                   timeout=600,
+                                                                   check=lambda comp: comp.author.id == ctx.author.id)
+                await perms.defer(edit_origin=True)
+            except asyncio.TimeoutError:
+                sel_ar["components"][0]["disabled"] = True
+                await msg.edit(
+                    content="Timed out.",
+                    components=[sel_ar]
+                )
+                return
+
+            perm = discord.PermissionOverwrite(
+                view_channel=True if "view_channel" in perms.selected_options else False,
+                manage_channel=True if "manage_channel" in perms.selected_options else False,
+                manage_permissions=True if "manage_permissions" in perms.selected_options else False,
+                create_instant_invite=True if "create_instant_invite" in perms.selected_options else False,
+                connect=True if "connect" in perms.selected_options else False,
+                speak=True if "speak" in perms.selected_options else False,
+                video=True if "video" in perms.selected_options else False,
+                use_voice_activation=True if "use_voice_activation" in perms.selected_options else False,
+                priority_speaker=True if "priority_speaker" in perms.selected_options else False,
+                mute_members=True if "mute_members" in perms.selected_options else False,
+                deafen_members=True if "deafen_members" in perms.selected_options else False,
+                move_members=True if "move_members" in perms.selected_options else False,
+            )
+
+            sel_ar["components"][0]["disabled"] = True
+
+            await perms.edit_origin(
+                content="Editing channel permissions....",
+                components=[sel_ar]
+            )
+
+            perm_overwrite = {
+                role_or_user: perm
+            }
+
+            await channel.edit(overwrites=perm_overwrite,
+                               reason=f"User {ctx.author.name} used the channel-permission-edit command!")
 
     ch_del_opt = [
         {
@@ -1378,6 +1465,7 @@ class ServerUtils(Cog):
             raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
         await channel.delete(reason=f"User {ctx.author.name} used the channel-delete command!")
         await ctx.send("done", hidden=True)
+
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="create", description="creates a category")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="edit", description="edits a category")
