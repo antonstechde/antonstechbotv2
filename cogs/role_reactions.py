@@ -78,7 +78,7 @@ class RoleReactions(Cog):
         cursor = utils.DB_CONNECTOR.get_new_cursor()
 
         sql = "select role_id from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s"
-        cursor.execute(sql, (channel_id, message_id, emoji.name))
+        cursor.execute(sql, (channel_id, message_id, str(emoji)))
 
         role_id = cursor.fetchone()
 
@@ -118,7 +118,7 @@ class RoleReactions(Cog):
         cursor = utils.DB_CONNECTOR.get_new_cursor()
 
         sql = "select role_id from role_reactions where channel_id = %s and message_id = %s and emoji_id = %s"
-        cursor.execute(sql, (channel_id, message_id, emoji.name))
+        cursor.execute(sql, (channel_id, message_id, str(emoji)))
 
         role_id = cursor.fetchone()
 
