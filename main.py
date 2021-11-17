@@ -24,7 +24,7 @@ def main():
 
     @bot.event
     async def on_ready():
-        if remove:
+        if remove is True:
             for i in bot.guilds:
                 guilds.append(i.id)
             await discord_slash.manage_commands.remove_all_commands(744218316167708773, utils.CONFIG.TOKEN, guild_ids=guilds)
