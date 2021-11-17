@@ -1,11 +1,13 @@
 import asyncio
 import discord
 import re
+
 from discord.ext.commands import Cog, AutoShardedBot
 from discord_slash import cog_ext, SlashContext, ButtonStyle, ComponentContext
 from discord_slash.utils import manage_components
 from discord_slash.utils.manage_components import wait_for_component, create_select_option
 from utils import utils, punishments
+from typing import Union
 
 
 class ServerUtils(Cog):
@@ -283,7 +285,8 @@ class ServerUtils(Cog):
                 not ctx.author.guild_permissions.ban_members
                 and not ctx.author.guild_permissions.kick_members
                 and not ctx.author.guild_permissions.manage_messages):
-            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_messages", "ban_members", "kick_members"])  # raise some error you like
+            raise discord.ext.commands.MissingPermissions(
+                missing_perms=["manage_messages", "ban_members", "kick_members"])  # raise some error you like
 
         if not ctx.author.guild_permissions.ban_members or not ctx.author.guild_permissions.kick_members:
             for i in range(2):
@@ -740,10 +743,11 @@ class ServerUtils(Cog):
                      reason: str):  # in theory discord-slash should automatically create options for that
         user_id = int(user_id)
         user: discord.User = await self.bot.fetch_user(user_id)
-        await ctx.guild.unban(user=user, reason=reason)
+        reason1 = f"User {ctx.author.name} used the unban command on {user.name}! \n Unban-Reason: {reason}"
+        await ctx.guild.unban(user=user, reason=reason1)
         await ctx.send(f"unbanned {user.mention}!")
 
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")
+    # @cog_ext.cog_subcommand(base="server", subcommand_group="user", name="un-punish", description="un-punishes a user")   # TODO: work on this when mute and warn system done
 
     radd_opt = [
         {
@@ -765,7 +769,7 @@ class ServerUtils(Cog):
     async def _role_add(self, ctx: SlashContext, user: discord.Member, role: discord.Role):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.MissingPermissions(missing_perms=["manage_roles"])
-        await user.add_roles(role)
+        await user.add_roles(role, reason=f"User {ctx.author.name} used the add-role command on {user.name}!")
         await ctx.send("Done!")
 
     rrem_opt = [
@@ -788,7 +792,7 @@ class ServerUtils(Cog):
     async def _role_remove(self, ctx: SlashContext, user: discord.Member, role: discord.Role):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.MissingPermissions(missing_perms=["manage_roles"])
-        await user.remove_roles(role)
+        await user.remove_roles(role, reason=f"User {ctx.author.name} used the remove-role command on {user.name}!")
         await ctx.send("Done!")
 
     rcre_opt = [
@@ -880,7 +884,8 @@ class ServerUtils(Cog):
                 components=[any_ar]
             )
             await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist,
-                                        mentionable=mentionable)
+                                        mentionable=mentionable,
+                                        reason=f"User {ctx.author.name} used the create-role command!")
             await ctx.channel.send("Done")
             return
 
@@ -912,7 +917,8 @@ class ServerUtils(Cog):
                 components=[adm_ar]
             )
             await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist,
-                                        mentionable=mentionable)
+                                        mentionable=mentionable,
+                                        reason=f"User {ctx.author.name} used the create-role command!")
             await ctx.channel.send("Done")
             return
 
@@ -927,7 +933,8 @@ class ServerUtils(Cog):
             content=f"Role '{name}' with color #{hexval} and your custom permissions, which have the value {roleperm.value}, is being created",
             components=[sel2row]
         ),
-        await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable)
+        await ctx.guild.create_role(name=name, color=color, permissions=roleperm, hoist=hoist, mentionable=mentionable,
+                                    reason=f"User {ctx.author.name} used the create-role command!")
 
         await ctx.channel.send("Done!")
 
@@ -1037,7 +1044,8 @@ class ServerUtils(Cog):
                 content="editing the role without changing permissions?",
                 components=[perm_ar]
             )
-            await role.edit(permissions=roleperm, name=name, hoist=hoist, mentionable=mentionable, colour=color)
+            await role.edit(permissions=roleperm, name=name, hoist=hoist, mentionable=mentionable, colour=color,
+                            reason=f"User {ctx.author.name} used the role-edit command!")
             await perm.origin_message.channel.send(content="Done")
             return
 
@@ -1068,7 +1076,7 @@ class ServerUtils(Cog):
                     components=[adm_ar]
                 )
                 await role.edit(name=name, color=color, permissions=roleperm, hoist=hoist,
-                                mentionable=mentionable)
+                                mentionable=mentionable, reason=f"User {ctx.author.name} used the role-edit command!")
                 await admin.origin_message.channel.send("Done")
                 return
 
@@ -1085,7 +1093,7 @@ class ServerUtils(Cog):
                     )
 
                     await role.edit(name=name, hoist=hoist, colour=color, mentionable=mentionable,
-                                    permissions=roleperm)
+                                    permissions=roleperm, reason=f"User {ctx.author.name} used the role-edit command!")
                     await secondperms.origin_message.channel.send(content="Done")
                 except ValueError:  # on timeout no values returned, just do nothing then
                     return
@@ -1104,15 +1112,363 @@ class ServerUtils(Cog):
     async def _delete_role(self, ctx: SlashContext, role: discord.Role):
         if not ctx.author.guild_permissions.manage_roles:
             raise discord.ext.commands.MissingPermissions(missing_perms=["manage_roles"])
-        await role.delete()
-        await ctx.send("role has been deleted")
+        await role.delete(reason=f"User {ctx.author.name} used the role-delete command!")
+        await ctx.send("role has been deleted", hidden=True)
 
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="create", description="creates a channel")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="edit", description="edits a channel") # not sure about that one
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="delete", description="deletes a channel")
+    ch_cre_opt = [
+        {
+            "name": "channel_type",
+            "description": "Text or Voice Channel",
+            "required": True,
+            "choices": [
+                {
+                    "name": "Text-channel",
+                    "value": discord.TextChannel,
+                },
+                {
+                    "name": "Voice-channel",
+                    "value": discord.VoiceChannel,
+                },
+            ],
+        },
+        {
+            "name": "name",
+            "description": "the name of the channel",
+            "type": 3,
+            "required": True,
+        },
+        {
+            "name": "category",
+            "description": "the category to add the channel to",
+            "type": 7,
+            "required": True,
+        },
+        {
+            "name": "nsfw",
+            "description": "whether the channel is nsfw. Default False (Text-Channel only)",
+            "type": 5,
+            "required": False,
+        },
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="create",
+                            description="creates a channel", options=ch_cre_opt)
+    async def _channel_create(self, ctx: SlashContext, channel_type: Union[discord.VoiceChannel, discord.TextChannel],
+                              name: str, category: discord.CategoryChannel, nsfw: bool = False):
+        if not ctx.author.guild_permissions.manage_channels:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
+        await ctx.defer(hidden=True)
+        if isinstance(channel_type, discord.TextChannel):
+            await ctx.guild.create_text_channel(name=name, category=category, nsfw=nsfw,
+                                                reason=f"User {ctx.author.name} used the channel-create command!")
+
+        elif isinstance(channel_type, discord.VoiceChannel):
+            await ctx.guild.create_voice_channel(name=name, category=category,
+                                                 reason=f"User {ctx.author.name} used the channel-create command!")
+        await ctx.send("done", hidden=True)
+
+    ch_edt_opt = [
+        {
+            "name": "channel",
+            "description": "The channel to edit",
+            "type": 7,
+            "required": True,
+        },
+        {
+            "name": "name",
+            "description": "The new name of the channel",
+            "type": 3,
+            "required": False,
+        },
+        {
+            "name": "slowmode_delay",
+            "description": "set the slowmode for the channel (only for text channels)",
+            "type": 4,
+            "required": False,
+        },
+        {
+            "name": "max_user_count",
+            "description": "set the max user count for the channel (only for voice channels",
+            "type": 4,
+            "required": False,
+        },
+        {
+            "name": "nsfw",
+            "description": "whether the channel is nsfw. (Text-Channel only)",
+            "type": 5,
+            "required": False,
+        },
+        {
+            "name": "position",
+            "description": "the position of the channel",
+            "type": 4,
+            "required": False,
+        },
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="edit",
+                            description="edits a channel", options=ch_edt_opt)
+    async def _channel_edit(self, ctx: SlashContext, channel: Union[discord.TextChannel, discord.VoiceChannel],
+                            name: str = None, slowmode_delay: int = None,
+                            max_user_count: int = None, nsfw: bool = None,
+                            position: int = None):
+        if not ctx.author.guild_permissions.manage_channels:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
+        await ctx.defer(hidden=True)
+        if isinstance(channel, discord.TextChannel):
+            await channel.edit(name=name if name is not None else channel.name,
+                               slowmode_delay=slowmode_delay if slowmode_delay is not None else channel.slowmode_delay,
+                               nsfw=nsfw if nsfw is not None else channel.nsfw,
+                               position=position if nsfw is not None else channel.position,
+                               reason=f"User {ctx.author.name} used the channel-edit command!")
+        elif isinstance(channel, discord.VoiceChannel):
+            await channel.edit(name=name if name is not None else channel.name,
+                               user_limit=max_user_count if max_user_count is not None else channel.user_limit,
+                               position=position if nsfw is not None else channel.position,
+                               reason=f"User {ctx.author.name} used the channel-edit command!")
+        await ctx.send("done", hidden=True)
+
+    ch_perm_edt_opt = [
+        {
+            "name": "channel",
+            "description": "the channel update permissions on",
+            "type": 7,
+            "required": True,
+        },
+        {
+            "name": "role_or_user",
+            "description": "the role or user to give special permissions over a channel",
+            "type": 9,
+            "required": True,
+        },
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="permission_edit", options=ch_perm_edt_opt,
+                            description="edits the permissions a user or a role has in a specific channel")
+    async def _channel_permission_edit(self, ctx: SlashContext,
+                                       channel: Union[discord.TextChannel, discord.VoiceChannel],
+                                       role_or_user: Union[discord.Role, discord.Member]):
+
+        if not ctx.author.guild_permissions.manage_channels and not ctx.author.guild_permissions.manage_permissions:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels", "manage_permissions"])
+
+        else:
+            await ctx.defer(hidden=False)
+
+        if isinstance(channel, discord.TextChannel):
+
+            perm_sel = manage_components.create_select(
+                min_values=1, max_values=14,
+                placeholder=f"choose the permissions to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}",
+                options=[
+                    create_select_option(
+                        label="view the channel", value="view_channel",
+                    ),
+                    create_select_option(
+                        label="manage the channel", value="manage_channel",
+                    ),
+                    create_select_option(
+                        label="manage channel permissions", value="manage_permissions",
+                    ),
+                    create_select_option(
+                        label="manage webhooks", value="manage_webhooks",
+                    ),
+                    create_select_option(
+                        label="create instant invite", value="create_instant_invite",
+                    ),
+                    create_select_option(
+                        label="send messages in the channel", value="send_messages",
+                    ),
+                    create_select_option(
+                        label="embed links in messages", value="embed_links",
+                    ),
+                    create_select_option(
+                        label="attach files to messages", value="attach_files",
+                    ),
+                    create_select_option(
+                        label="add reactions to messages", value="add_reactions",
+                    ),
+                    create_select_option(
+                        label="use external emojis in messages", value="use_external_emojis",
+                    ),
+                    create_select_option(
+                        label="mention @everyone", value="mention_everyone",
+                    ),
+                    create_select_option(
+                        label="manage messages", value="manage_messages",
+                    ),
+                    create_select_option(
+                        label="read message history", value="read_message_history",
+                    ),
+                    create_select_option(
+                        label="send tts messages", value="send_tts_messages",
+                    ),
+                ]
+            )
+            sel_ar = manage_components.create_actionrow(perm_sel)
+            msg = await ctx.send(
+                content=f"What Permissions do you want to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}"
+                        f"all not selected permissions will be **denied**",
+                components=[sel_ar]
+            )
+
+            try:
+                perms: ComponentContext = await wait_for_component(self.bot, components=[sel_ar],
+                                                                   timeout=600,
+                                                                   check=lambda comp: comp.author.id == ctx.author.id)
+                await perms.defer(edit_origin=True)
+            except asyncio.TimeoutError:
+                sel_ar["components"][0]["disabled"] = True
+                await msg.edit(
+                    content="Timed out.",
+                    components=[sel_ar]
+                )
+                return
+
+            perm = discord.PermissionOverwrite(
+                view_channel=True if "view_channel" in perms.selected_options else False,
+                manage_channel=True if "manage_channel" in perms.selected_options else False,
+                manage_permissions=True if "manage_permissions" in perms.selected_options else False,
+                manage_webhooks=True if "manage_webhooks" in perms.selected_options else False,
+                create_instant_invite=True if "create_instant_invite" in perms.selected_options else False,
+                send_messages=True if "send_messages" in perms.selected_options else False,
+                embed_links=True if "embed_links" in perms.selected_options else False,
+                attach_files=True if "attach_files" in perms.selected_options else False,
+                add_reactions=True if "add_reactions" in perms.selected_options else False,
+                use_external_emojis=True if "use_external_emojis" in perms.selected_options else False,
+                mention_everyone=True if "mention_everyone" in perms.selected_options else False,
+                manage_messages=True if "manage_messages" in perms.selected_options else False,
+                read_message_history=True if "read_message_history" in perms.selected_options else False,
+                send_tts_messages=True if "send_tts_messages" in perms.selected_options else False,
+            )
+
+            sel_ar["components"][0]["disabled"] = True
+
+            await perms.edit_origin(
+                content="Editing channel permissions....",
+                components=[sel_ar]
+            )
+
+            perm_overwrite = {
+                role_or_user: perm
+            }
+            await channel.edit(overwrites=perm_overwrite,
+                               reason=f"User {ctx.author.name} used the channel-permission-edit command!")
+            await perms.channel.send(f"Done, channel '{channel.name} has been edited!", delete_after=180)
+
+        elif isinstance(channel, discord.VoiceChannel):
+
+            perm_sel = manage_components.create_select(
+                min_values=1, max_values=12,
+                placeholder=f"choose the permissions to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}",
+                options=[
+                    create_select_option(
+                        label="view the channel", value="view_channel",
+                    ),
+                    create_select_option(
+                        label="manage the channel", value="manage_channel",
+                    ),
+                    create_select_option(
+                        label="manage channel permissions", value="manage_permissions",
+                    ),
+                    create_select_option(
+                        label="create instant invite", value="create_instant_invite",
+                    ),
+                    create_select_option(
+                        label="connect to the channel", value="connect",
+                    ),
+                    create_select_option(
+                        label="speak in the channel", value="speak",
+                    ),
+                    create_select_option(
+                        label="enable camera", value="video",
+                    ),
+                    create_select_option(
+                        label="use voice activation", value="use_voice_activation",
+                    ),
+                    create_select_option(
+                        label="very important speaker", value="priority_speaker",
+                    ),
+                    create_select_option(
+                        label="mute members", value="mute_members",
+                    ),
+                    create_select_option(
+                        label="deafen members", value="deafen_members",
+                    ),
+                    create_select_option(
+                        label="move members in another channel", value="move_members",
+                    ),
+                ]
+            )
+            sel_ar = manage_components.create_actionrow(perm_sel)
+            msg = await ctx.send(
+                content=f"What Permissions do you want to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}"
+                        f"all not selected permissions will be **denied**",
+                components=[sel_ar]
+            )
+
+            try:
+                perms: ComponentContext = await wait_for_component(self.bot, components=[sel_ar],
+                                                                   timeout=600,
+                                                                   check=lambda comp: comp.author.id == ctx.author.id)
+                await perms.defer(edit_origin=True)
+            except asyncio.TimeoutError:
+                sel_ar["components"][0]["disabled"] = True
+                await msg.edit(
+                    content="Timed out.",
+                    components=[sel_ar]
+                )
+                return
+
+            perm = discord.PermissionOverwrite(
+                view_channel=True if "view_channel" in perms.selected_options else False,
+                manage_channel=True if "manage_channel" in perms.selected_options else False,
+                manage_permissions=True if "manage_permissions" in perms.selected_options else False,
+                create_instant_invite=True if "create_instant_invite" in perms.selected_options else False,
+                connect=True if "connect" in perms.selected_options else False,
+                speak=True if "speak" in perms.selected_options else False,
+                video=True if "video" in perms.selected_options else False,
+                use_voice_activation=True if "use_voice_activation" in perms.selected_options else False,
+                priority_speaker=True if "priority_speaker" in perms.selected_options else False,
+                mute_members=True if "mute_members" in perms.selected_options else False,
+                deafen_members=True if "deafen_members" in perms.selected_options else False,
+                move_members=True if "move_members" in perms.selected_options else False,
+            )
+
+            sel_ar["components"][0]["disabled"] = True
+
+            await perms.edit_origin(
+                content="Editing channel permissions....",
+                components=[sel_ar]
+            )
+
+            perm_overwrite = {
+                role_or_user: perm
+            }
+
+            await channel.edit(overwrites=perm_overwrite,
+                               reason=f"User {ctx.author.name} used the channel-permission-edit command!")
+
+    ch_del_opt = [
+        {
+            "name": "channel",
+            "description": "The channel to edit",
+            "type": 7,
+            "required": True,
+        },
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="delete",
+                            description="deletes a channel", options=ch_del_opt)
+    async def _channel_delete(self, ctx: SlashContext, channel: Union[discord.TextChannel, discord.VoiceChannel]):
+        if not ctx.author.guild_permissions.manage_channels:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
+        await channel.delete(reason=f"User {ctx.author.name} used the channel-delete command!")
+        await ctx.send("done", hidden=True)
+
 
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="create", description="creates a category")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="edit", description="edits a category") # not sure about that one
+    # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="edit", description="edits a category")
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="delete", description="deletes a category")
 
 
