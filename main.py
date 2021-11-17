@@ -5,8 +5,10 @@ import discord
 from discord import Intents
 from discord.ext.commands import AutoShardedBot
 from discord_slash import SlashCommand, __version__
-
+import discord_slash
 from utils import utils
+
+remove = False  # True removes all commands
 
 
 def main():
@@ -22,6 +24,9 @@ def main():
 
     @bot.event
     async def on_ready():
+        if remove:
+            await discord_slash.manage_commands.remove_all_commands(744218316167708773, utils.CONFIG.TOKEN, [723220208772186156, 908371267751661639])
+            raise SystemExit
         server_names = [guild.name for guild in bot.guilds]
         final_server_names = ", ".join(server_names)
         config_string = f"""Information:
