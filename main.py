@@ -9,6 +9,7 @@ import discord_slash
 from utils import utils
 
 remove = False  # True removes all commands
+guilds = []
 
 
 def main():
@@ -20,12 +21,15 @@ def main():
     bot = AutoShardedBot(command_prefix="!", self_bot=True, intents=Intents.all())
     bot.remove_command("help")
 
+    for i in bot.guilds:
+        guilds.append(i.id)
+
     SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
     @bot.event
     async def on_ready():
         if remove:
-            await discord_slash.manage_commands.remove_all_commands(744218316167708773, utils.CONFIG.TOKEN, [723220208772186156, 908371267751661639])
+            await discord_slash.manage_commands.remove_all_commands(744218316167708773, utils.CONFIG.TOKEN, guild_ids=guilds)
             raise SystemExit
         server_names = [guild.name for guild in bot.guilds]
         final_server_names = ", ".join(server_names)

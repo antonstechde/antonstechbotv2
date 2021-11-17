@@ -1120,15 +1120,15 @@ class ServerUtils(Cog):
             "name": "channel_type",
             "description": "Text or Voice Channel",
             "required": True,
-            "type": 7,
+            "type": 3,
             "choices": [
                 {
                     "name": "Text-channel",
-                    "value": discord.TextChannel,
+                    "value": "TextChannel",
                 },
                 {
                     "name": "Voice-channel",
-                    "value": discord.VoiceChannel,
+                    "value": "VoiceChannel",
                 },
             ],
         },
@@ -1154,16 +1154,16 @@ class ServerUtils(Cog):
 
     @cog_ext.cog_subcommand(base="server", subcommand_group="channel", name="create",
                             description="creates a channel", options=ch_cre_opt)
-    async def _channel_create(self, ctx: SlashContext, channel_type: Union[discord.VoiceChannel, discord.TextChannel],
+    async def _channel_create(self, ctx: SlashContext, channel_type: str,
                               name: str, category: discord.CategoryChannel, nsfw: bool = False):
         if not ctx.author.guild_permissions.manage_channels:
             raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
         await ctx.defer(hidden=True)
-        if isinstance(channel_type, discord.TextChannel):
+        if channel_type == "TextChannel":
             await ctx.guild.create_text_channel(name=name, category=category, nsfw=nsfw,
                                                 reason=f"User {ctx.author.name} used the channel-create command!")
 
-        elif isinstance(channel_type, discord.VoiceChannel):
+        elif channel_type == "VoiceChannel":
             await ctx.guild.create_voice_channel(name=name, category=category,
                                                  reason=f"User {ctx.author.name} used the channel-create command!")
         await ctx.send("done", hidden=True)
