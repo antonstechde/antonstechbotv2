@@ -1466,10 +1466,52 @@ class ServerUtils(Cog):
         await channel.delete(reason=f"User {ctx.author.name} used the channel-delete command!")
         await ctx.send("done", hidden=True)
 
+    cat_cre_opt = [
+        {
+            "name": "name",
+            "description": "the name of the category",
+            "type": 3,
+            "required": True,
+        },
+        {
+            "name": "position",
+            "description": "the position of the category",
+            "type": 4,
+            "required": True
+        }
+    ]
 
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="create", description="creates a category")
+    @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="create",
+                            description="creates a category", options=cat_cre_opt)
+    async def _category_create(self, ctx: SlashContext, name: str, position: int):
+        if not ctx.author.guild_permissions.manage_channels:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
+
+        else:
+            await ctx.guild.create_category(name=name, position=position+1,
+                                            reason=f"User {ctx.author.name} used the category-create command!")
+            await ctx.send("done!", hidden=True)
+
     # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="edit", description="edits a category")
-    # @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="delete", description="deletes a category")
+
+    cat_del_opt = [
+        {
+            "name": "category",
+            "description": "The category to delete",
+            "type": 7,
+            "required": True,
+        } ,
+    ]
+
+    @cog_ext.cog_subcommand(base="server", subcommand_group="category", name="delete",
+                            description="deletes a category", options=cat_del_opt)
+    async def _cat_delete(self, ctx: SlashContext, category: discord.CategoryChannel):
+        if not ctx.author.guild_permissions.manage_channels:
+            raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels"])
+
+        else:
+            await category.delete(reason=f"User {ctx.author.name} used the category-delete command!")
+            await ctx.send("done!", hidden=True)
 
 
 def setup(bot: AutoShardedBot):
