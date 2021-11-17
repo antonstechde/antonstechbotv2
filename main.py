@@ -20,15 +20,13 @@ def main():
     # Enabling self_bot ensures that the bot does not try and parse messages that start with "!".
     bot = AutoShardedBot(command_prefix="!", self_bot=True, intents=Intents.all())
     bot.remove_command("help")
-
-    for i in bot.guilds:
-        guilds.append(i.id)
-
     SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
     @bot.event
     async def on_ready():
         if remove:
+            for i in bot.guilds:
+                guilds.append(i.id)
             await discord_slash.manage_commands.remove_all_commands(744218316167708773, utils.CONFIG.TOKEN, guild_ids=guilds)
             raise SystemExit
         server_names = [guild.name for guild in bot.guilds]
