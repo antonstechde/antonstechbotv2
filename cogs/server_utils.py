@@ -177,7 +177,7 @@ class ServerUtils(Cog):
                     value="speak",
                 ),
                 create_select_option(
-                    label="stream in voice channels",
+                    label="stream in voice channels / enable camera",
                     value="stream",
                 ),
                 create_select_option(
@@ -1307,7 +1307,7 @@ class ServerUtils(Cog):
             )
             sel_ar = manage_components.create_actionrow(perm_sel)
             msg = await ctx.send(
-                content=f"What Permissions do you want to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}"
+                content=f"What Permissions do you want to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}\n"
                         f"all not selected permissions will be **denied**",
                 components=[sel_ar]
             )
@@ -1315,7 +1315,7 @@ class ServerUtils(Cog):
             try:
                 perms: ComponentContext = await wait_for_component(self.bot, components=[sel_ar],
                                                                    timeout=600,
-                                                                   check=lambda comp: comp.author.id == ctx.author.id)
+                                                                   check=lambda p: p.author.id == ctx.author.id)
                 await perms.defer(edit_origin=True)
             except asyncio.TimeoutError:
                 sel_ar["components"][0]["disabled"] = True
@@ -1366,7 +1366,7 @@ class ServerUtils(Cog):
                         label="view the channel", value="view_channel",
                     ),
                     create_select_option(
-                        label="manage the channel", value="manage_channel",
+                        label="manage the channel", value="manage_channels",
                     ),
                     create_select_option(
                         label="manage channel permissions", value="manage_permissions",
@@ -1381,7 +1381,7 @@ class ServerUtils(Cog):
                         label="speak in the channel", value="speak",
                     ),
                     create_select_option(
-                        label="enable camera", value="video",
+                        label="stream/camera", value="stream",
                     ),
                     create_select_option(
                         label="use voice activation", value="use_voice_activation",
@@ -1427,7 +1427,7 @@ class ServerUtils(Cog):
                 create_instant_invite=True if "create_instant_invite" in perms.selected_options else False,
                 connect=True if "connect" in perms.selected_options else False,
                 speak=True if "speak" in perms.selected_options else False,
-                video=True if "video" in perms.selected_options else False,
+                stream=True if "stream" in perms.selected_options else False,
                 use_voice_activation=True if "use_voice_activation" in perms.selected_options else False,
                 priority_speaker=True if "priority_speaker" in perms.selected_options else False,
                 mute_members=True if "mute_members" in perms.selected_options else False,
@@ -1542,7 +1542,7 @@ class ServerUtils(Cog):
                             label="view the channel", value="view_channel",
                         ),
                         create_select_option(
-                            label="manage the channel", value="manage_channel",
+                            label="manage the channel", value="manage_channels",
                         ),
                         create_select_option(
                             label="manage channel permissions", value="manage_permissions",
@@ -1613,7 +1613,7 @@ class ServerUtils(Cog):
                             label="speak in the channel", value="speak",
                         ),
                         create_select_option(
-                            label="enable camera", value="video",
+                            label="stream/camera", value="stream",
                         ),
                         create_select_option(
                             label="use voice activation", value="use_voice_activation",
@@ -1669,7 +1669,7 @@ class ServerUtils(Cog):
                     send_tts_messages=True if "send_tts_messages" in text_perms.selected_options else False,
                     connect=True if "connect" in voice_perms.selected_options else False,
                     speak=True if "speak" in voice_perms.selected_options else False,
-                    video=True if "video" in voice_perms.selected_options else False,
+                    stream=True if "stream" in voice_perms.selected_options else False,
                     use_voice_activation=True if "use_voice_activation" in voice_perms.selected_options else False,
                     priority_speaker=True if "priority_speaker" in voice_perms.selected_options else False,
                     mute_members=True if "mute_members" in voice_perms.selected_options else False,
