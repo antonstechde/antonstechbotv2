@@ -1258,7 +1258,7 @@ class ServerUtils(Cog):
             await ctx.defer(hidden=False)
 
         if isinstance(channel, discord.TextChannel):
-            utils.LOGGER.debug(f"Test: {isinstance(role_or_user, discord.Member)}")
+            utils.LOGGER.debug(f"Test: {isinstance(role_or_user, str)}")
             perm_sel = manage_components.create_select(
                 min_values=1, max_values=14,
                 placeholder=f"choose the permissions to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}",
