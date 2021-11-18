@@ -1257,7 +1257,6 @@ class ServerUtils(Cog):
             await ctx.defer(hidden=False)
 
         if isinstance(channel, discord.TextChannel):
-
             perm_sel = manage_components.create_select(
                 min_values=1, max_values=14,
                 placeholder=f"choose the permissions to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}",
@@ -1266,7 +1265,7 @@ class ServerUtils(Cog):
                         label="view the channel", value="view_channel",
                     ),
                     create_select_option(
-                        label="manage the channel", value="manage_channel",
+                        label="manage the channel", value="manage_channels",
                     ),
                     create_select_option(
                         label="manage channel permissions", value="manage_permissions",
@@ -1328,7 +1327,7 @@ class ServerUtils(Cog):
 
             perm = discord.PermissionOverwrite(
                 view_channel=True if "view_channel" in perms.selected_options else False,
-                manage_channel=True if "manage_channel" in perms.selected_options else False,
+                manage_channels=True if "manage_channels" in perms.selected_options else False,
                 manage_permissions=True if "manage_permissions" in perms.selected_options else False,
                 manage_webhooks=True if "manage_webhooks" in perms.selected_options else False,
                 create_instant_invite=True if "create_instant_invite" in perms.selected_options else False,
@@ -1423,7 +1422,7 @@ class ServerUtils(Cog):
 
             perm = discord.PermissionOverwrite(
                 view_channel=True if "view_channel" in perms.selected_options else False,
-                manage_channel=True if "manage_channel" in perms.selected_options else False,
+                manage_channels=True if "manage_channels" in perms.selected_options else False,
                 manage_permissions=True if "manage_permissions" in perms.selected_options else False,
                 create_instant_invite=True if "create_instant_invite" in perms.selected_options else False,
                 connect=True if "connect" in perms.selected_options else False,
@@ -1655,7 +1654,7 @@ class ServerUtils(Cog):
 
                 allperms = discord.PermissionOverwrite(
                     view_channel=True if "view_channel" in text_perms.selected_options else False,
-                    manage_channel=True if "manage_channel" in text_perms.selected_options else False,
+                    manage_channels=True if "manage_channels" in text_perms.selected_options else False,
                     manage_permissions=True if "manage_permissions" in text_perms.selected_options else False,
                     manage_webhooks=True if "manage_webhooks" in text_perms.selected_options else False,
                     create_instant_invite=True if "create_instant_invite" in text_perms.selected_options else False,
