@@ -1353,6 +1353,8 @@ class ServerUtils(Cog):
                     components=[sel_ar]
                 )
 
+                utils.LOGGER.debug(f"type: {type(role_or_user)}\n .id: {role_or_user.id}")
+
                 perm_overwrite = {
                     role_or_user: perm
                 }
@@ -1450,7 +1452,7 @@ class ServerUtils(Cog):
             )
 
             perm_overwrite = {
-                role_or_user: perm
+                role_or_user: perm,
             }
 
             await channel.edit(overwrites=perm_overwrite,
