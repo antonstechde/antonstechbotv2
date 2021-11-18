@@ -1353,7 +1353,7 @@ class ServerUtils(Cog):
                     components=[sel_ar]
                 )
 
-                utils.LOGGER.debug(f"type: {type(role_or_user)}\n .id: {role_or_user.id}")
+                utils.LOGGER.debug(f"type: {type(role_or_user)}")
 
                 perm_overwrite = {
                     role_or_user: perm
