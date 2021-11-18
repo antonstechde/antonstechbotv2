@@ -1,4 +1,6 @@
 import asyncio
+import traceback
+
 import discord
 import re
 
@@ -1344,17 +1346,22 @@ class ServerUtils(Cog):
 
             sel_ar["components"][0]["disabled"] = True
 
-            await perms.edit_origin(
-                content="Editing channel permissions....",
-                components=[sel_ar]
-            )
+            try:
 
-            perm_overwrite = {
-                role_or_user: perm
-            }
-            await channel.edit(overwrites=perm_overwrite,
-                               reason=f"User {ctx.author.name} used the channel-permission-edit command!")
-            await perms.channel.send(f"Done, channel '{channel.name} has been edited!", delete_after=180)
+                await perms.edit_origin(
+                    content="Editing channel permissions....",
+                    components=[sel_ar]
+                )
+
+                perm_overwrite = {
+                    role_or_user: perm
+                }
+                await channel.edit(overwrites=perm_overwrite,
+                                   reason=f"User {ctx.author.name} used the channel-permission-edit command!")
+                await perms.channel.send(f"Done, channel '{channel.name} has been edited!", delete_after=180)
+            except AttributeError:
+                error = traceback.format_exc()
+                utils.LOGGER.error(error)
 
         elif isinstance(channel, discord.VoiceChannel):
 
