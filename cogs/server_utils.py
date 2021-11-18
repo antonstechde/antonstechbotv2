@@ -1251,7 +1251,6 @@ class ServerUtils(Cog):
     async def _channel_permission_edit(self, ctx: SlashContext,
                                        channel: Union[discord.TextChannel, discord.VoiceChannel],
                                        role_or_user: Union[discord.Role, discord.Member]):
-
         if not ctx.author.guild_permissions.manage_channels and not ctx.author.guild_permissions.manage_permissions:
             raise discord.ext.commands.MissingPermissions(missing_perms=["manage_channels", "manage_permissions"])
 
@@ -1259,6 +1258,7 @@ class ServerUtils(Cog):
             await ctx.defer(hidden=False)
 
         if isinstance(channel, discord.TextChannel):
+            utils.LOGGER.debug(f"Test: {isinstance(role_or_user, discord.Member)}")
             perm_sel = manage_components.create_select(
                 min_values=1, max_values=14,
                 placeholder=f"choose the permissions to give the {'user' if isinstance(role_or_user, discord.Member) else 'role'}",
