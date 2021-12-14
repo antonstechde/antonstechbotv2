@@ -1,8 +1,9 @@
-from discord.ext.commands import AutoShardedBot, Cog
-from discord_slash import cog_ext, SlashContext
-from utils import utils
 import discord
 import requests
+from discord.ext.commands import AutoShardedBot, Cog
+from discord_slash import SlashContext, cog_ext
+
+from utils import utils
 
 
 class Memes(Cog):

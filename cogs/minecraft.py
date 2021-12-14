@@ -1,9 +1,11 @@
-from discord.ext.commands import AutoShardedBot, Cog
-from discord_slash import cog_ext, SlashContext
 import datetime
-from utils import utils
+
 import discord
 import requests
+from discord.ext.commands import AutoShardedBot, Cog
+from discord_slash import SlashContext, cog_ext
+
+from utils import utils
 
 
 class Minecraft(Cog):
@@ -11,23 +13,24 @@ class Minecraft(Cog):
         self.bot = bot
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
-    @cog_ext.cog_slash(name="minecraft",
-                       description="Lets you look up Minecraft Skins and Servers", options=[
+    @cog_ext.cog_slash(
+        name="minecraft",
+        description="Lets you look up Minecraft Skins and Servers",
+        options=[
             {
                 "name": "skin",
                 "description": "Lets you look up a Skin",
                 "type": 3,
-                "required": "false"
+                "required": "false",
             },
-
             {
                 "name": "server",
                 "description": "lets you look up a Server",
                 "type": 3,
-                "required": "false"
-            }
-
-        ])
+                "required": "false",
+            },
+        ],
+    )
     async def minecraft_commands(self, ctx: SlashContext, **kwargs):
         await ctx.defer(hidden=False)
         try:
@@ -43,7 +46,7 @@ class Minecraft(Cog):
             embed.set_image(url=body + playeruuid + "?size=512")
             embed.set_author(name="Skin Download", url="https://minotar.net/download/" + playername)
             await ctx.send(embed=embed)
-        except:
+        except Exception:
             try:
                 servername = kwargs["server"]
                 base_url = "https://api.mcsrvstat.us/2/"
@@ -62,22 +65,23 @@ class Minecraft(Cog):
                         version = response["version"]
                         software = response["software"]
                         embed.add_field(name="Version", value=f"{software} {version}")
-                    except:
+                    except Exception:
                         pass
                     try:
                         version = response["version"]
                         embed.add_field(name="Version", value=version)
-                    except:
+                    except Exception:
                         embed.add_field(name="Version", value="Unknown")
                     try:
                         mods = response["mods"]["names"]
                         if mods != "":
-                            embed.set_author(name="Modlist",
-                                             url='https://mcsrvstat.us/server/' + servername)
+                            embed.set_author(
+                                name="Modlist", url="https://mcsrvstat.us/server/" + servername
+                            )
                             embed.add_field(name="Modlist", value="See link above")
                         else:
                             pass
-                    except:
+                    except Exception:
                         pass
                     embed.set_thumbnail(url="https://api.mcsrvstat.us/icon/" + servername)
                     if response["debug"]["cachetime"] != 0:
@@ -93,7 +97,7 @@ class Minecraft(Cog):
                             for character in characters_to_remove:
                                 playernames = playernames.replace(character, "")
                             embed.add_field(name="Playernames:", value=playernames)
-                        except:
+                        except Exception:
                             pass
                     else:
                         pass
@@ -103,7 +107,7 @@ class Minecraft(Cog):
                     await ctx.send(embed=embed)
             except KeyError:
                 await ctx.send(f'{ctx.author.mention} Invalid Option! Choose "skin" or "server"')
-            except:
+            except Exception:
                 await ctx.send("Something went wrong!")
 
 

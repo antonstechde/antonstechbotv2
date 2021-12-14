@@ -1,9 +1,10 @@
 import discord.ext.commands.errors
 from discord import Guild
-from discord.ext.commands import Cog, Bot
 from discord.ext import commands
-from utils import utils
+from discord.ext.commands import Bot, Cog
 from discord.ext.commands.errors import MissingPermissions
+
+from utils import utils
 
 
 class Events(Cog):
@@ -15,9 +16,11 @@ class Events(Cog):
     async def on_message(self, message):
         try:
             if message.mentions[0] == self.bot.user:
-                await message.channel.send(f"Hey {message.author.mention} : ) \n "
-                                           f"Discord does not want us to use text based Bots anymore so we switched to the new Slash Command System\n"
-                                           f'Try it out by Typing "/" in this Channel :)')
+                await message.channel.send(
+                    f"Hey {message.author.mention} : ) \n "
+                    f"Discord does not want us to use text based Bots anymore so we switched to the new Slash Command System\n"
+                    f'Try it out by Typing "/" in this Channel :)'
+                )
         except IndexError:
             pass
 
@@ -28,12 +31,21 @@ class Events(Cog):
     @commands.Cog.listener()
     async def on_slash_command_error(self, event, *args, **kwargs):
         # catch slash command errors
-        error, = args
+        (error,) = args
         if isinstance(error, MissingPermissions):
-            await event.send(embed=utils.return_embed(event, "Insufficient Permissions!", "You don't have enough permissions to run this command!", discord.Color.red()))
+            await event.send(
+                embed=utils.return_embed(
+                    event,
+                    "Insufficient Permissions!",
+                    "You don't have enough permissions to run this command!",
+                    discord.Color.red(),
+                )
+            )
             return
 
-        utils.LOGGER.error(f"Discord-Interactions error: \nEvent: {event}\n*args: {args}\n**kwargs: {kwargs}")
+        utils.LOGGER.error(
+            f"Discord-Interactions error: \nEvent: {event}\n*args: {args}\n**kwargs: {kwargs}"
+        )
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: Guild):

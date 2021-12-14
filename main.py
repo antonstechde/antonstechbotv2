@@ -1,15 +1,6 @@
-import asyncio
-import os
+import interactions
 
-import discord
-from discord import Intents
-from discord.ext.commands import AutoShardedBot
-from discord_slash import SlashCommand, __version__
-import discord_slash
 from utils import utils
-
-remove = False  # True removes all commands
-guilds = []
 
 
 def main():
@@ -18,33 +9,27 @@ def main():
     # Note that command_prefix is a required but essentially unused parameter.
     # Setting help_command=False ensures that discord.py does not create a !help command. <--- Doesn't work lol
     # Enabling self_bot ensures that the bot does not try and parse messages that start with "!".
-    bot = AutoShardedBot(command_prefix="!", self_bot=True, intents=Intents.all())
-    bot.remove_command("help")
-    SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
+    bot = interactions.Client(token=utils.CONFIG.TOKEN, intents=interactions.Intents.ALL)
 
     @bot.event
     async def on_ready():
-        if remove is True:
-            for i in bot.guilds:
-                guilds.append(i.id)
-            await discord_slash.manage_commands.remove_all_commands(744218316167708773, utils.CONFIG.TOKEN, guild_ids=guilds)
-            raise SystemExit
-        server_names = [guild.name for guild in bot.guilds]
+        server_names = [guild.name for guild in bot.http.get_self_guilds()]
         final_server_names = ", ".join(server_names)
         config_string = f"""Information:
-    - Logged in as {bot.user}
+    - Logged in as {bot.me}
     - Bot running on Version {utils.CONFIG.Version}
-    - discord-py-interaction version: {__version__}
-    - Is in the following {str(len(bot.guilds))} servers:
+    - Is in the following {str(len(bot.http.get_self_guilds()))} servers:
         {final_server_names}
         """
 
         utils.LOGGER.info(config_string)
 
-        bot.loop.create_task(status_task())
+        # bot.loop.create_task(status_task())
 
+    """
     async def status_task():
         while True:
+
             await bot.change_presence(activity=discord.Game("https://git.io/techbotv2"),
                                       status=discord.Status.online)
             utils.LOGGER.debug("Changed bot presence to 'https://git.io/techbotv2'")
@@ -61,13 +46,16 @@ def main():
                 activity=discord.Activity(type=discord.ActivityType.listening, name="to you talking in voice channels"))
             utils.LOGGER.debug("Changed bot presence to 'to you talking in voice channels'")
 
+    """
+    """
     for filename in os.listdir(utils.get_project_dir() + "/cogs/"):
         if filename.endswith(".py") and filename not in ["basicerror.py"]:
             utils.LOGGER.debug(f"Attempting to load cog {filename[:-3]}")
             bot.load_extension(f"cogs.{filename[:-3]}")
 
-    bot.run(utils.CONFIG.TOKEN)
+    """
+    bot.start()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
