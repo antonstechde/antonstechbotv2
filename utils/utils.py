@@ -62,7 +62,7 @@ def run_checks():
         user=CONFIG.DATABASE_USER,
         password=CONFIG.DATABASE_PASSWORD,
         port=CONFIG.DATABASE_PORT,
-        host=CONFIG.DATABASE_HOST,
+        host=CONFIG.DATABASE_HOST
     )
 
     DB_CONNECTOR.connect()
