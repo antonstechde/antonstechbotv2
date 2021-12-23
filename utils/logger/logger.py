@@ -2,17 +2,20 @@ import os
 import pathlib
 import sys
 import traceback as tb_module
-
 from datetime import datetime
-from colorama import Style
 from threading import Lock
 
-from utils.logger.error_levels import DebugLevel
-from utils.logger.error_levels import Level, InfoLevel, ErrorLevel, WarningLevel
+from colorama import Style
+
+from utils.logger.error_levels import Level
 
 
 class Logger:
-    def __init__(self, should_log_to_file: bool = False, only_print_over_and_including_severity=InfoLevel.InfoLevel()):
+    def __init__(
+        self,
+        should_log_to_file: bool = False,
+        only_print_over_and_including_severity=Level.InfoLevel(),
+    ):
         self.__should_log_to_file__: bool = should_log_to_file
         self.__only_print_over_and_including_severity__ = only_print_over_and_including_severity
 
@@ -37,7 +40,9 @@ class Logger:
 
     def __print_message__(self, level: Level.Level, message):
         if level.severity_number >= self.__only_print_over_and_including_severity__.severity_number:
-            print(f"{level.color}[{level.severity}] {self.__get_format__()}: {message}{Style.RESET_ALL}")
+            print(
+                f"{level.color}[{level.severity}] {self.__get_format__()}: {message}{Style.RESET_ALL}"
+            )
 
         if self.__should_log_to_file__:
             with open(self.__log_path__ + "/bot.log", "a") as f:
@@ -45,31 +50,19 @@ class Logger:
 
     def debug(self, message):
         with self.__lock__:
-            self.__print_message__(
-                level=DebugLevel.DebugLevel(),
-                message=message
-            )
+            self.__print_message__(level=Level.DebugLevel(), message=message)
 
     def info(self, message):
         with self.__lock__:
-            self.__print_message__(
-                level=InfoLevel.InfoLevel(),
-                message=message
-            )
+            self.__print_message__(level=Level.InfoLevel(), message=message)
 
     def warning(self, message):
         with self.__lock__:
-            self.__print_message__(
-                level=WarningLevel.WarningLevel(),
-                message=message
-            )
+            self.__print_message__(level=Level.WarningLevel(), message=message)
 
     def error(self, message):
         with self.__lock__:
-            self.__print_message__(
-                level=ErrorLevel.ErrorLevel(),
-                message=message
-            )
+            self.__print_message__(level=Level.ErrorLevel(), message=message)
 
     def custom_sys_except_hook(self, exctype, value, traceback):
         error = "".join(tb_module.format_exception(exctype, value, traceback))

@@ -1,8 +1,8 @@
-from discord.ext.commands import Bot, Cog
-from discord.ext import commands, tasks
 import requests
+from discord.ext import tasks
+from discord.ext.commands import Bot, Cog
+
 from utils import utils
-import asyncio
 
 
 class Betteruptime(Cog):
