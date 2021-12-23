@@ -1,0 +1,23 @@
+name: antonstechbotv2
+type: sw.application
+description: >-
+  A Multi-Functional Discord Bot :)
+assets:
+  repository:
+    type: blob.asset
+    data:
+      url: 'https://github.com/antonstechde/antonstechbotv2'
+  logo:
+    type: blob.asset
+    data:
+      url: >-
+        https://avatars.githubusercontent.com/u/82707586?s=512&v=4
+data:
+  defaultDeviceType: raspberry-pi4-64
+  supportedDeviceTypes:
+    - raspberry-pi
+    - raspberry-pi2
+    - raspberrypi3
+    - fincm3
+    - intel-nuc
+version: 1.0.2
