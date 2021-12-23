@@ -1,12 +1,12 @@
 import os
 
 import discord
-from discord import Embed
+from discord.ext import commands
 from discord.ext.commands import Bot, Cog
-from discord_slash import cog_ext, SlashContext
+from discord_slash import SlashContext, cog_ext
+
 from config.adminconfig import get_admin_permissions
 from utils import utils
-from discord.ext import commands
 
 
 def ist_gepinnt(message):
@@ -21,20 +21,32 @@ class Commands(Cog):
     @cog_ext.cog_slash(name="invite", description="Lets you invite the Bot")
     async def _bot_invite(self, ctx: SlashContext):
         embed = discord.Embed()
-        embed.set_author(name="Click me :D",
-                         url=discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(8),
-                                                     guild=ctx.guild, scopes=["bot", "applications.commands"]))
+        embed.set_author(
+            name="Click me :D",
+            url=discord.utils.oauth_url(
+                self.bot.user.id,
+                permissions=discord.Permissions(8),
+                guild=ctx.guild,
+                scopes=["bot", "applications.commands"],
+            ),
+        )
         await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(name="vote", description="Here you can find a link to vote for our bot <3")
     async def _vote(self, ctx: SlashContext):
         embed = discord.Embed()
-        embed.set_author(name="Currently we only have a few Votes but you can vote for us here :D",
-                         url="https://top.gg/bot/744218316167708773/vote")
+        embed.set_author(
+            name="Currently we only have a few Votes but you can vote for us here :D",
+            url="https://top.gg/bot/744218316167708773/vote",
+        )
         await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(name="shutdown", description="Shuts down the bot",
-                       default_permission=False, permissions=get_admin_permissions())
+    @cog_ext.cog_slash(
+        name="shutdown",
+        description="Shuts down the bot",
+        default_permission=False,
+        permissions=get_admin_permissions(),
+    )
     async def _shutdown(self, ctx: SlashContext):
         os.system("git pull")
         await ctx.send("Shutting down...")
@@ -50,7 +62,6 @@ class Commands(Cog):
         except TypeError:
             await ctx.send("Invalid amount of messages to delete")
             return
-
 
 
 def setup(bot: Bot):

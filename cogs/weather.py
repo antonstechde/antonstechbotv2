@@ -1,9 +1,11 @@
 from datetime import datetime
-from utils import utils
-from discord.ext.commands import AutoShardedBot, Cog
-from discord_slash import cog_ext, SlashContext
-import requests
+
 import discord
+import requests
+from discord.ext.commands import AutoShardedBot, Cog
+from discord_slash import SlashContext, cog_ext
+
+from utils import utils
 
 
 class Weather(Cog):
@@ -14,13 +16,18 @@ class Weather(Cog):
         self.base_url = "https://api.openweathermap.org/data/2.5/weather?"
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
-    @cog_ext.cog_slash(name="weather", description="Lets you display the current Weather in a City",
-                       options=[{
-                           "name": "city",
-                           "description": "Please provide your City here",
-                           "type": 3,
-                           "required": "true"
-                       }])
+    @cog_ext.cog_slash(
+        name="weather",
+        description="Lets you display the current Weather in a City",
+        options=[
+            {
+                "name": "city",
+                "description": "Please provide your City here",
+                "type": 3,
+                "required": "true",
+            }
+        ],
+    )
     async def _wetter_command(self, ctx: SlashContext, **kwargs):
         await ctx.defer(hidden=False)
         city = kwargs["city"]
@@ -38,13 +45,18 @@ class Weather(Cog):
                 z = response["weather"]
                 symbol = z[0]["icon"]
                 weather_desc = z[0]["description"]
-                embed = discord.Embed(title=f"Weather in {city}",
-                                      color=ctx.guild.me.top_role.color,
-                                      timestamp=datetime.now(), )
+                embed = discord.Embed(
+                    title=f"Weather in {city}",
+                    color=ctx.guild.me.top_role.color,
+                    timestamp=datetime.now(),
+                )
                 embed.add_field(name="Description", value=f"**{weather_desc}**", inline=False)
-                embed.add_field(name="Temperature(C)", value=f"**{current_temp_celsius}°C**", inline=False)
-                embed.add_field(name="Feels like(C)", value=f"**{feels_like_celsius}°C**",
-                                inline=False)
+                embed.add_field(
+                    name="Temperature(C)", value=f"**{current_temp_celsius}°C**", inline=False
+                )
+                embed.add_field(
+                    name="Feels like(C)", value=f"**{feels_like_celsius}°C**", inline=False
+                )
                 embed.add_field(name="Humidity(%)", value=f"**{humidity}%**", inline=False)
                 embed.add_field(name="Air-Pressure(hPa)", value=f"**{pressure}hPa**", inline=False)
                 embed.set_thumbnail(url="https://openweathermap.org/img/wn/" + symbol + ".png")
@@ -57,7 +69,7 @@ class Weather(Cog):
             else:
                 await ctx.send("Something went wrong")
 
-        except:
+        except Exception:
             await ctx.send("Something went wrong")
 
 

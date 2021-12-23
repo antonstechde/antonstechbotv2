@@ -1,11 +1,11 @@
 import discord
-from discord.ext.commands import Cog, AutoShardedBot
-from discord_slash import cog_ext, SlashContext
 from discord.channel import TextChannel
 from discord.emoji import Emoji
-from discord.role import Role
-from discord.ext import commands
 from discord.errors import Forbidden, NotFound
+from discord.ext import commands
+from discord.ext.commands import AutoShardedBot, Cog
+from discord.role import Role
+from discord_slash import SlashContext, cog_ext
 
 from utils import utils
 
@@ -15,21 +15,33 @@ class RoleReactions(Cog):
         self.bot: AutoShardedBot = bot
         utils.LOGGER.debug(f"Successfully loaded cog {self.__class__.__name__}")
 
-    @cog_ext.cog_subcommand(base="role_reaction", name="create", description="Create a role reaction")
+    @cog_ext.cog_subcommand(
+        base="role_reaction", name="create", description="Create a role reaction"
+    )
     @commands.has_permissions(administrator=True)
-    async def role_reactions_create(self, ctx: SlashContext, channel: TextChannel, message: str, emoji: Emoji, role: Role):
+    async def role_reactions_create(
+        self, ctx: SlashContext, channel: TextChannel, message: str, emoji: Emoji, role: Role
+    ):
         await ctx.defer(hidden=False)
 
         try:
             message = int(message)
         except ValueError:
-            await ctx.send(embed=utils.return_embed(ctx, "Error", "The message id is not a number!", discord.Color.red()))
+            await ctx.send(
+                embed=utils.return_embed(
+                    ctx, "Error", "The message id is not a number!", discord.Color.red()
+                )
+            )
             return
 
         try:
             fetched_message: discord.Message = await channel.fetch_message(message)
         except NotFound:
-            await ctx.send(embed=utils.return_embed(ctx, "Error", "The message was not found!", discord.Color.red()))
+            await ctx.send(
+                embed=utils.return_embed(
+                    ctx, "Error", "The message was not found!", discord.Color.red()
+                )
+            )
             return
 
         # if the reaction is already on the message, this will handle it
@@ -58,7 +70,14 @@ class RoleReactions(Cog):
         utils.DB_CONNECTOR.commit()
         cursor.close()
 
-        await ctx.send(embed=utils.return_embed(ctx, "Done", f"Successfully set up a role reaction at [this message]({fetched_message.jump_url})!", discord.Color.green()))
+        await ctx.send(
+            embed=utils.return_embed(
+                ctx,
+                "Done",
+                f"Successfully set up a role reaction at [this message]({fetched_message.jump_url})!",
+                discord.Color.green(),
+            )
+        )
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -86,14 +105,16 @@ class RoleReactions(Cog):
             # no entries found, shouldn't happen
             return
 
-        role_id, = role_id
+        (role_id,) = role_id
 
         role: Role = guild.get_role(role_id)
 
         try:
             await member.add_roles(role, reason="Role-Reaction")
-        except Forbidden as e:
-            utils.LOGGER.debug(f"Could not give \"{member.display_name}\" the role \"{role.name}\" because the bot doesn't have permissions")
+        except Forbidden:
+            utils.LOGGER.debug(
+                f'Could not give "{member.display_name}" the role "{role.name}" because the bot doesn\'t have permissions'
+            )
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -126,15 +147,16 @@ class RoleReactions(Cog):
             # no entries found
             return
 
-        role_id, = role_id
+        (role_id,) = role_id
 
         role: Role = guild.get_role(role_id)
 
         try:
             await member.remove_roles(role, reason="Role-Reaction")
-        except Forbidden as e:
+        except Forbidden:
             utils.LOGGER.debug(
-                f"Could not remove the role \"{role.name}\" from \"{member.display_name}\" because the bot doesn't have permissions")
+                f'Could not remove the role "{role.name}" from "{member.display_name}" because the bot doesn\'t have permissions'
+            )
 
 
 def setup(bot: AutoShardedBot):

@@ -1,5 +1,4 @@
 import psycopg2
-
 from psycopg2.extensions import cursor
 
 
@@ -19,7 +18,7 @@ class Connector:
             user=self.user,
             database=self.database,
             password=self.password,
-            port=self.port
+            port=self.port,
         )
 
     def get_new_cursor(self) -> cursor:

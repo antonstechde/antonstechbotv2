@@ -47,3 +47,4 @@ class Status(Cog):
 
 def setup(bot: AutoShardedBot):
     bot.add_cog(Status(bot))
+    
