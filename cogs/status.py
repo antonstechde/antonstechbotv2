@@ -29,6 +29,8 @@ class Status(Cog):
                        f"Users: {len(set(self.bot.get_all_members()))}\n"
                        "-------\n"
                        f"Bot Technical:\n"
+                       f"Coded by : Antonstech, Ed_Vraz and DestinyofYeet :)\n"
+                       f"Python Version: {platform.python_version()}\n"
                        f"Running on Version {utils.CONFIG.Version}\n"
                        f"RAM-Usage: {memory_use.rss / 1024000} MB \n"
                        f'Running Since: {time.strftime("%d.%m.%Y %H:%M", time.localtime(process.create_time()))}\n'
